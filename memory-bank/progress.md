@@ -2,7 +2,8 @@
 
 ## Overall Status
 
-**v0.1.0 IN PROGRESS** — PR #1 open (`feat/init`); CI green; Copilot findings addressed.
+**v0.1.0 SHIPPED** — PR #1 merged (`f720184`), tagged v0.1.0, GitHub release created 2026-03-24.
+**v0.1.1 ACTIVE** — branch `feat/v0.1.1` cut from main `f720184`.
 
 ---
 
@@ -28,8 +29,8 @@
 
 ### v0.1.0 — IN PROGRESS
 
-- [ ] PR #1 merged to main
-- [ ] Tagged v0.1.0 + GitHub release created
+- [x] PR #1 merged to main (`f720184`)
+- [x] Tagged v0.1.0 + GitHub release created
 - [ ] lib-foundation `.clinerules` upstream fix (`_detect_platform` values) — track in lib-foundation `feat/v0.3.10`
 
 ### Future
