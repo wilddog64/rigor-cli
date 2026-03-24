@@ -1,0 +1,25 @@
+name: CI
+on:
+  push:
+    branches: [main, "feat/**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install bats
+        run: |
+          BATS_VERSION="v1.11.0"
+          git clone --branch "${BATS_VERSION}" --depth 1 https://github.com/bats-core/bats-core.git /tmp/bats-core
+          sudo /tmp/bats-core/install.sh /usr/local
+      - name: shellcheck
+        run: shellcheck bin/rigor
+      - name: BATS
+        run: |
+          env -i PATH="/usr/local/bin:/usr/bin:/bin" HOME="$HOME" TMPDIR="${TMPDIR:-/tmp}" \
+            bash --norc --noprofile -c 'bats scripts/tests/rigor.bats'
