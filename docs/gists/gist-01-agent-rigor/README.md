@@ -16,7 +16,7 @@ bash install.sh --no-ci  # skip CI workflow
 | Step | Result |
 |------|--------|
 | git subtree add | `.rigor/` — versioned, updatable |
-| bin/rigor wrapper | `bin/rigor checkpoint | audit | lint` |
+| bin/rigor wrapper | `bin/rigor` subcommands: `checkpoint`, `audit`, `lint` |
 | pre-commit hook | `.git/hooks/pre-commit` — runs `rigor audit` |
 | CI workflow (optional) | `.github/workflows/rigor.yml` — shellcheck on every push/PR |
 

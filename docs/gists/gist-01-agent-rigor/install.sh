@@ -23,6 +23,7 @@ _err()  { printf 'ERROR: %s\n' "$*" >&2; exit 1; }
 
 _check_deps() {
   command -v git >/dev/null 2>&1  || _err "git is required"
+  git subtree --help >/dev/null 2>&1 || _err "git subtree is required (run: git subtree --help to verify)"
   git rev-parse --is-inside-work-tree >/dev/null 2>&1 || _err "must run from inside a git repo"
 }
 
@@ -51,17 +52,22 @@ SCRIPT
 }
 
 _install_pre_commit() {
-  if [[ -f .git/hooks/pre-commit ]]; then
-    _info ".git/hooks/pre-commit already exists — skipping"
+  local hooks_dir
+  if ! hooks_dir="$(git rev-parse --git-path hooks 2>/dev/null)"; then
+    hooks_dir=".git/hooks"
+  fi
+  mkdir -p "$hooks_dir"
+  if [[ -f "$hooks_dir/pre-commit" ]]; then
+    _info "$hooks_dir/pre-commit already exists — skipping"
     return 0
   fi
-  _info "Installing pre-commit hook ..."
-  cat > .git/hooks/pre-commit <<'HOOK'
+  _info "Installing pre-commit hook in $hooks_dir/ ..."
+  cat > "$hooks_dir/pre-commit" <<'HOOK'
 #!/usr/bin/env bash
 set -euo pipefail
 bin/rigor audit
 HOOK
-  chmod +x .git/hooks/pre-commit
+  chmod +x "$hooks_dir/pre-commit"
 }
 
 _write_ci_workflow() {
@@ -94,10 +100,11 @@ YAML
 }
 
 _prompt_ci() {
-  local answer
+  local answer lc_answer
   printf 'Write .github/workflows/rigor.yml CI workflow? [y/N] '
   read -r answer || true
-  case "${answer,,}" in
+  lc_answer="$(printf '%s' "$answer" | tr '[:upper:]' '[:lower:]')"
+  case "$lc_answer" in
     y|yes) return 0 ;;
     *)     return 1 ;;
   esac
