@@ -1,0 +1,34 @@
+# .clinerules — rigor-cli
+
+Standalone CLI dispatcher over lib-foundation's agent rigor framework. Exposes `checkpoint | audit | lint` subcommands. No Kubernetes dependency — works with any Bash project.
+
+## Layout
+
+```
+bin/rigor                  — dispatcher (checkpoint | audit | lint)
+scripts/lib/foundation/    — lib-foundation git subtree (DO NOT EDIT)
+scripts/tests/rigor.bats   — BATS test suite
+.github/workflows/ci.yml   — shellcheck + BATS CI
+```
+
+## Before Any Task
+
+1. Read `memory-bank/activeContext.md` — branch, focus, open tasks
+2. Read `memory-bank/progress.md` — what is done, what is pending
+3. `git pull origin <current-branch>` — another agent may have pushed
+
+## Critical Rules
+
+- **`scripts/lib/foundation/` is read-only** — it is a git subtree from lib-foundation; all changes go upstream first, then `git subtree pull`
+- **No bare `sudo`** — always `_run_command --prefer-sudo` or `_run_command --require-sudo`
+- **Double-quote all variable expansions** — `"$var"`, never bare `$var` in command args
+- **`set -euo pipefail`** on all new scripts
+- **No eval with external input**
+- **Pin all versions** — no unpinned `git clone` in CI workflows; use `--branch vX.Y.Z`
+- **NEVER run `git rebase -i`, `git reset --hard`, or `git push --force`**
+
+## Key Contracts — Do Not Break
+
+`bin/rigor` subcommands: `checkpoint | audit | lint`
+`_detect_platform` returns: `mac | wsl | debian | redhat | linux`
+`_run_command` mode flags: `--prefer-sudo`, `--require-sudo`, `--probe '<subcmd>'`, `--quiet`
