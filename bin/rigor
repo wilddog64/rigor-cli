@@ -24,7 +24,9 @@ _rigor_usage() {
 _rigor_shellcheck() {
   local files=("$@")
   if [[ ${#files[@]} -eq 0 ]]; then
-    mapfile -t files < <(git ls-files '*.sh' 2>/dev/null || true)
+    while IFS= read -r f; do
+      files+=("$f")
+    done < <(git ls-files '*.sh' 2>/dev/null || true)
   fi
   if [[ ${#files[@]} -eq 0 ]]; then
     echo "rigor lint: no shell files provided" >&2

@@ -3,6 +3,7 @@
 ## Current State: `feat/v0.1.1` (as of 2026-03-24)
 
 **v0.1.0 SHIPPED** — PR #1 merged to main (`f720184`), tagged v0.1.0, GitHub release created 2026-03-24. `enforce_admins` restored.
+**PR #2 MERGED** — `e302af4f` 2026-03-24 — README Scope section + v0.1.0 retro + Copilot PR#2 fixes. `enforce_admins` restored.
 
 ---
 
@@ -22,16 +23,17 @@ lib-foundation consumed via git subtree at `scripts/lib/foundation/`.
 | Version | Status | Notes |
 |---|---|---|
 | v0.1.0 | **SHIPPED** | PR #1 merged (`f720184`) — initial dispatcher + subtree + BATS 3 tests; 2026-03-24; tagged v0.1.0 |
-| v0.1.1 | **ACTIVE** | branch `feat/v0.1.1` cut from main `f720184` |
+| v0.1.1 | **ACTIVE** | PR #3 open — mapfile compat + gist-01 install script |
 
 ---
 
 ## Open Items
 
 - [x] **PR #1** — merged `f720184`; tagged v0.1.0; GitHub release created
-- [ ] **lib-foundation `.clinerules` fix** — `_detect_platform` values wrong in subtree; fix upstream in lib-foundation `feat/v0.3.10`
-- [ ] **Gist 1 install script** — `docs/gists/gist-01-agent-rigor/` in k3d-manager; wire pre-commit + CI workflow
-- [ ] **`mapfile` bash 3.2 compat** — `_rigor_shellcheck` uses `mapfile`; fix in v0.1.1
+- [x] **PR #2** — merged `e302af4f`; README Scope section; v0.1.0 retro; Copilot PR#2 findings fixed; `enforce_admins` restored
+- [ ] **PR #3** — open; mapfile compat fix + gist-01 install script; awaiting CI + Copilot
+- [ ] **lib-foundation `.clinerules` fix** — PR #16 open in lib-foundation `feat/v0.3.10`; subtree pull after merge
+- [ ] **Gist 1 publish** — publish `docs/gists/gist-01-agent-rigor/install.sh` to GitHub Gists after PR #3 merges
 
 ---
 
