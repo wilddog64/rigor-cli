@@ -108,6 +108,10 @@ scripts/
 
 ## Documentation
 
+### How-To
+
+- [Install rigor-cli into any Bash project](docs/howto/install-into-any-repo.md) — one-command install, manual steps, update, scope
+
 ### Key Contracts
 
 #### `rigor audit`
