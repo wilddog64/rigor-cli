@@ -3,7 +3,7 @@
 ## Overall Status
 
 **v0.1.0 SHIPPED** — PR #1 merged (`f720184`), tagged v0.1.0, GitHub release created 2026-03-24.
-**v0.1.1 ACTIVE** — PR #3 merged (`f304c14`) 2026-03-24; lib-foundation subtree pulled (`c5662c9`); symlink tech debt resolved (`c283d48`).
+**v0.1.1 ACTIVE** — PR #4 open — milestone close-out; all items complete pending merge.
 
 ---
 
@@ -20,7 +20,7 @@
 - [x] `.clinerules` (repo root)
 - [x] `memory-bank/` initialized
 - [x] Branch protection on `main` — required status checks + enforce_admins + 1 approving review
-- [x] Copilot PR #1 findings addressed (b96470d): bats-core pinned; .clinerules subtree issue flagged upstream
+- [x] Copilot PR #1 findings addressed (`b96470d`): bats-core pinned; .clinerules subtree issue flagged upstream
 - [x] Issue doc: `docs/issues/2026-03-24-copilot-pr1-review-findings.md`
 - [x] PR #2 merged (`e302af4f`) — README Scope section, v0.1.0 retro, Copilot PR#2 findings fixed; enforce_admins restored
 - [x] mapfile compat fix (`8ae57bc`) — `while IFS= read -r` in `_rigor_shellcheck`
@@ -28,14 +28,15 @@
 - [x] PR #3 merged (`f304c14`) — mapfile compat + gist-01; Copilot 4 findings fixed; enforce_admins restored
 - [x] lib-foundation subtree pull (`c5662c9`) — `.clinerules` fix lands in subtree
 - [x] Symlink tech debt resolved (`c283d48`) — `_RIGOR_LIB_DIR` updated to real path `scripts/lib/foundation/scripts/lib`
+- [x] Gist published — https://gist.github.com/wilddog64/81c767a0560e39c8d6e0f8bd9706973b
 
 ---
 
 ## What Is Pending
 
-### v0.1.1 — ACTIVE (on feat/v0.1.1)
+### v0.1.1 — ACTIVE (PR #4 open)
 
-- [x] Publish gist — https://gist.github.com/wilddog64/81c767a0560e39c8d6e0f8bd9706973b
+- [ ] PR #4 merge + v0.1.1 tag + GitHub release
 
 ---
 
