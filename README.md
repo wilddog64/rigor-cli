@@ -6,9 +6,9 @@ Three subcommands cover the full spec-driven workflow: `audit` catches style and
 
 ## Scope
 
-rigor-cli enforces quality on **Bash/shell scripts only**. It checks staged `.sh` files at commit time and runs `shellcheck` on `.sh` files in CI. Non-shell code (Python, Go, Ruby, etc.) is out of scope — use language-specific linters for those.
+rigor-cli enforces quality on **Bash/shell scripts only**. By default it targets files with a `.sh` extension — staged `.sh` files at commit time and `shellcheck` on `.sh` files in CI. Non-shell code (Python, Go, Ruby, etc.) is out of scope — use language-specific linters for those.
 
-If your repo is primarily non-shell, rigor-cli still guards the shell layer: CI scripts, install helpers, `bin/` tooling, and any `.sh` files checked into the repo.
+If your repo is primarily non-shell, rigor-cli still guards the shell layer: CI scripts, install helpers, and any `.sh` files checked into the repo. Shell scripts without a `.sh` extension (e.g. `bin/rigor` itself) are not picked up automatically — pass them explicitly to `rigor lint` if you want them checked.
 
 ---
 

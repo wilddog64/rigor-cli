@@ -27,7 +27,7 @@
 
 ## What Is Pending
 
-### v0.1.0 — IN PROGRESS
+### v0.1.0 — SHIPPED (`f720184`)
 
 - [x] PR #1 merged to main (`f720184`)
 - [x] Tagged v0.1.0 + GitHub release created
