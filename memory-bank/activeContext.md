@@ -23,7 +23,7 @@ lib-foundation consumed via git subtree at `scripts/lib/foundation/`.
 | Version | Status | Notes |
 |---|---|---|
 | v0.1.0 | **SHIPPED** | PR #1 merged (`f720184`) — initial dispatcher + subtree + BATS 3 tests; 2026-03-24; tagged v0.1.0 |
-| v0.1.1 | **ACTIVE** | PR #3 open — mapfile compat + gist-01 install script |
+| v0.1.1 | **ACTIVE** | PR #3 merged (`f304c14`) — mapfile compat + gist-01; subtree pulled; symlink debt resolved (`c283d48`) |
 
 ---
 
@@ -31,9 +31,10 @@ lib-foundation consumed via git subtree at `scripts/lib/foundation/`.
 
 - [x] **PR #1** — merged `f720184`; tagged v0.1.0; GitHub release created
 - [x] **PR #2** — merged `e302af4f`; README Scope section; v0.1.0 retro; Copilot PR#2 findings fixed; `enforce_admins` restored
-- [ ] **PR #3** — open; mapfile compat fix + gist-01 install script; awaiting CI + Copilot
-- [ ] **lib-foundation `.clinerules` fix** — PR #16 open in lib-foundation `feat/v0.3.10`; subtree pull after merge
-- [ ] **Gist 1 publish** — publish `docs/gists/gist-01-agent-rigor/install.sh` to GitHub Gists after PR #3 merges
+- [x] **PR #3** — merged `f304c14`; mapfile compat + gist-01; Copilot 4 findings fixed; enforce_admins restored
+- [x] **lib-foundation `.clinerules` fix** — PR #16 merged (`c5662c9`); subtree pulled into rigor-cli
+- [x] **Symlink tech debt** — `_RIGOR_LIB_DIR` updated to real subtree path (`c283d48`); BATS 3/3
+- [ ] **Gist 1 publish** — publish `docs/gists/gist-01-agent-rigor/install.sh` to GitHub Gists
 
 ---
 

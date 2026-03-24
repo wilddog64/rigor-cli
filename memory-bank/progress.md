@@ -3,7 +3,7 @@
 ## Overall Status
 
 **v0.1.0 SHIPPED** — PR #1 merged (`f720184`), tagged v0.1.0, GitHub release created 2026-03-24.
-**v0.1.1 ACTIVE** — PR #3 open — mapfile compat + gist-01 install script.
+**v0.1.1 ACTIVE** — PR #3 merged (`f304c14`) 2026-03-24; lib-foundation subtree pulled (`c5662c9`); symlink tech debt resolved (`c283d48`).
 
 ---
 
@@ -25,16 +25,16 @@
 - [x] PR #2 merged (`e302af4f`) — README Scope section, v0.1.0 retro, Copilot PR#2 findings fixed; enforce_admins restored
 - [x] mapfile compat fix (`8ae57bc`) — `while IFS= read -r` in `_rigor_shellcheck`
 - [x] Gist-01 install script (`310fd16`) — `docs/gists/gist-01-agent-rigor/install.sh`
+- [x] PR #3 merged (`f304c14`) — mapfile compat + gist-01; Copilot 4 findings fixed; enforce_admins restored
+- [x] lib-foundation subtree pull (`c5662c9`) — `.clinerules` fix lands in subtree
+- [x] Symlink tech debt resolved (`c283d48`) — `_RIGOR_LIB_DIR` updated to real path `scripts/lib/foundation/scripts/lib`
 
 ---
 
 ## What Is Pending
 
-### v0.1.1 — ACTIVE (PR #3 open)
+### v0.1.1 — ACTIVE (on feat/v0.1.1)
 
-- [ ] PR #3 merge — CI green + Copilot review
-- [ ] lib-foundation `.clinerules` upstream fix — PR #16 open in lib-foundation `feat/v0.3.10`
-- [ ] Subtree pull after lib-foundation PR #16 merges
 - [ ] Publish gist — `docs/gists/gist-01-agent-rigor/install.sh` → GitHub Gists
 
 ---
@@ -44,4 +44,3 @@
 | Item | Notes |
 |---|---|
 | `scripts/lib/foundation/` | Read-only git subtree — never edit directly |
-| Symlinks in subtree | `scripts/lib/foundation/system.sh` + `agent_rigor.sh` are symlinks into deep subtree path — functional, tech debt |
