@@ -14,3 +14,8 @@
 - `bin/rigor` dispatcher — `checkpoint | audit | lint` subcommands
 - lib-foundation v0.3.8 as git subtree at `scripts/lib/foundation/`
 - BATS tests (3): audit pass, audit fail (tab indent), lint fail (shellcheck)
+
+## [Unreleased] v0.1.1
+
+### Fixed
+- replace `mapfile` with `while IFS= read -r` in `_rigor_shellcheck` for bash 3.2 compatibility
