@@ -14,7 +14,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install bats
         run: |
-          git clone --depth 1 https://github.com/bats-core/bats-core.git /tmp/bats-core
+          BATS_VERSION="v1.11.0"
+          git clone --branch "${BATS_VERSION}" --depth 1 https://github.com/bats-core/bats-core.git /tmp/bats-core
           sudo /tmp/bats-core/install.sh /usr/local
       - name: shellcheck
         run: shellcheck bin/rigor
