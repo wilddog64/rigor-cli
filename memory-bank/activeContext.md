@@ -34,7 +34,7 @@ lib-foundation consumed via git subtree at `scripts/lib/foundation/`.
 - [x] **PR #3** — merged `f304c14`; mapfile compat + gist-01; Copilot 4 findings fixed; enforce_admins restored
 - [x] **lib-foundation `.clinerules` fix** — PR #16 merged (`c5662c9`); subtree pulled into rigor-cli
 - [x] **Symlink tech debt** — `_RIGOR_LIB_DIR` updated to real subtree path (`c283d48`); BATS 3/3
-- [ ] **Gist 1 publish** — publish `docs/gists/gist-01-agent-rigor/install.sh` to GitHub Gists
+- [x] **Gist 1 publish** — https://gist.github.com/wilddog64/81c767a0560e39c8d6e0f8bd9706973b
 
 ---
 

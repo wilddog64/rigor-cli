@@ -35,7 +35,7 @@
 
 ### v0.1.1 — ACTIVE (on feat/v0.1.1)
 
-- [ ] Publish gist — `docs/gists/gist-01-agent-rigor/install.sh` → GitHub Gists
+- [x] Publish gist — https://gist.github.com/wilddog64/81c767a0560e39c8d6e0f8bd9706973b
 
 ---
 
