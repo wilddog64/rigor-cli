@@ -1,5 +1,13 @@
 # Changes — rigor-cli
 
+## [Unreleased] — v0.1.1
+
+### Added
+- `docs/retro/2026-03-24-v0.1.0-retrospective.md` — v0.1.0 retrospective
+- README `## Scope` section — clarifies rigor-cli checks shell scripts only; non-shell code is out of scope
+
+---
+
 ## [v0.1.0] — initial release
 
 ### Added
