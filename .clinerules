@@ -1,14 +1,14 @@
-# .clinerules — rigor-cli
+# .clinerules — lib-foundation
 
-Standalone CLI dispatcher over lib-foundation's agent rigor framework. Exposes `checkpoint | audit | lint` subcommands. No Kubernetes dependency — works with any Bash project.
+Shared Bash foundation library consumed by k3d-manager, rigor-cli, and shopping-carts via git subtree.
 
 ## Layout
 
 ```
-bin/rigor                  — dispatcher (checkpoint | audit | lint)
-scripts/lib/foundation/    — lib-foundation git subtree (DO NOT EDIT)
-scripts/tests/rigor.bats   — BATS test suite
-.github/workflows/ci.yml   — shellcheck + BATS CI
+scripts/lib/core.sh       — cluster lifecycle, provider abstraction
+scripts/lib/system.sh     — _run_command, _detect_platform, package helpers, BATS install
+scripts/tests/lib/        — BATS unit tests
+memory-bank/              — persistent agent context (read before any task)
 ```
 
 ## Before Any Task
@@ -19,16 +19,37 @@ scripts/tests/rigor.bats   — BATS test suite
 
 ## Critical Rules
 
-- **`scripts/lib/foundation/` is read-only** — it is a git subtree from lib-foundation; all changes go upstream first, then `git subtree pull`
 - **No bare `sudo`** — always `_run_command --prefer-sudo` or `_run_command --require-sudo`
 - **Double-quote all variable expansions** — `"$var"`, never bare `$var` in command args
 - **`set -euo pipefail`** on all new scripts
 - **No eval with external input**
-- **Pin all versions** — no unpinned `git clone` in CI workflows; use `--branch vX.Y.Z`
+- **Pin all versions** — no `latest` tags in images or Helm charts
 - **NEVER run `git rebase -i`, `git reset --hard`, or `git push --force`**
 
 ## Key Contracts — Do Not Break
 
-`bin/rigor` subcommands: `checkpoint | audit | lint`
-`_detect_platform` returns: `mac | wsl | debian | redhat | linux`
 `_run_command` mode flags: `--prefer-sudo`, `--require-sudo`, `--probe '<subcmd>'`, `--quiet`
+`_detect_platform` returns: `mac | wsl | debian | redhat | linux`
+`_cluster_provider` reads: `CLUSTER_PROVIDER` / `K3D_MANAGER_PROVIDER` / `K3DMGR_PROVIDER`
+
+Changing these signatures requires coordination with all consumers (k3d-manager, rigor-cli, shopping-carts).
+
+## Testing
+
+```bash
+# Always run BATS in a clean environment
+env -i HOME="$HOME" PATH="$PATH" bats scripts/tests/lib/
+
+# shellcheck every touched .sh file
+shellcheck scripts/lib/core.sh scripts/lib/system.sh
+```
+
+Never report a test as passing if it was only run in an interactive shell where
+SCRIPT_DIR or CLUSTER_PROVIDER may already be set.
+
+## Commit Protocol
+
+- Self-commit your own work — your commit is your sign-off
+- Update `memory-bank/` to report task completion
+- Run shellcheck on every `.sh` file you touch and include the result in your report
+- Stay within the task spec — no unsanctioned changes, even improvements
