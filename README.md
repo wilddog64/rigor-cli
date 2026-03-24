@@ -4,6 +4,12 @@ Standalone CLI for the [lib-foundation](https://github.com/wilddog64/lib-foundat
 
 Three subcommands cover the full spec-driven workflow: `audit` catches style and security violations at commit time, `lint` runs shellcheck across all shell files in CI, and `checkpoint` creates a safe mid-task save point during development. No Kubernetes dependency — works with any Bash project.
 
+## Scope
+
+rigor-cli enforces quality on **Bash/shell scripts only**. It checks staged `.sh` files at commit time and runs `shellcheck` on `.sh` files in CI. Non-shell code (Python, Go, Ruby, etc.) is out of scope — use language-specific linters for those.
+
+If your repo is primarily non-shell, rigor-cli still guards the shell layer: CI scripts, install helpers, `bin/` tooling, and any `.sh` files checked into the repo.
+
 ---
 
 ## Quick Start
