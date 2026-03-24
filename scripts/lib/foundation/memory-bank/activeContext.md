@@ -1,13 +1,14 @@
 # Active Context — lib-foundation
 
-## Current State: `feat/v0.3.9` (as of 2026-03-24)
+## Current State: `feat/v0.3.10` (as of 2026-03-24)
 
 **v0.3.4 SHIPPED** — PR #11 merged to main (`dbfafe9`), tagged v0.3.4, GitHub release created 2026-03-22.
 **v0.3.5 SHIPPED** — PR #10 squash-merged to main (`2f895a99`) 2026-03-23. No tag (no CHANGELOG entry). `enforce_admins` restored.
 **v0.3.6 SHIPPED** — PR #12 merged to main (`d8b4c48`) 2026-03-23. Tagged v0.3.6, GitHub release created. `enforce_admins` restored.
 **v0.3.7 SHIPPED** — PR #13 merged to main (`071c270`) 2026-03-24. Tagged v0.3.7 retroactively, GitHub release created. system.sh if-count cleanup.
 **v0.3.8 SHIPPED** — PR #14 merged to main (`a669a63`) 2026-03-24. Tagged v0.3.8 retroactively, GitHub release created. Tab indentation enforcement in `_agent_audit`.
-**feat/v0.3.9 ACTIVE** — branch cut from main `a669a63` 2026-03-24. `enforce_admins` restored.
+**v0.3.9 SHIPPED** — PR #15 merged to main (`fb09921`) 2026-03-24. No tag (docs-only, no version bump). Release history backfill + memory-bank reconciliation. `enforce_admins` restored.
+**feat/v0.3.10 ACTIVE** — branch cut from main `fb09921` 2026-03-24. `_detect_platform` contract corrected in `.clinerules` (`efb22e9`). `enforce_admins` restored.
 
 ---
 
@@ -33,7 +34,8 @@ API reference: `docs/api/functions.md`
 | v0.3.6 | **SHIPPED** | PR #12 merged (`d8b4c48`) — code-fence exclusion + CoreDNS Check 4; 2026-03-23 |
 | v0.3.7 | **SHIPPED** | PR #13 merged (`071c270`) — system.sh if-count cleanup; 2026-03-24; tagged v0.3.7 retroactively |
 | v0.3.8 | **SHIPPED** | PR #14 merged (`a669a63`) — tab indentation enforcement in `_agent_audit`; 2026-03-24; tagged v0.3.8 retroactively |
-| v0.3.9 | **ACTIVE** | branch `feat/v0.3.9` cut from main |
+| v0.3.9 | **SHIPPED** | PR #15 merged (`fb09921`) — release history backfill + memory-bank reconciliation; 2026-03-24; no tag (docs-only) |
+| v0.3.10 | **ACTIVE** | branch `feat/v0.3.10` cut from main `fb09921` |
 
 ---
 
@@ -46,7 +48,7 @@ API reference: `docs/api/functions.md`
 - [x] **v0.3.6: Check 2 code-fence exclusion** — commit `7751068` adds `_dh_strip_fences`, optional `_dh_grep --strip-fences`, and 3 BATS tests per `docs/plans/v0.3.6-doc-hygiene-codefence-exclusion.md`.
 - [x] **v0.3.6: CoreDNS Check 4** — commit `c352c1b` adds YAML-only warn on `<svc>.<ns>.svc(.cluster.local)` + 4 BATS tests per `docs/plans/v0.3.5-doc-hygiene-coredns-check.md`.
 - [x] **v0.3.6: indented fence fix** — commit `02e7418` updates `_dh_strip_fences` to handle indented fences + adds indented BATS per `docs/plans/v0.3.6-doc-hygiene-indented-fence-fix.md`.
-- [ ] `rigor-cli` — separate repo, lib-foundation as git subtree; CLI: `checkpoint|audit|lint`
+- [x] `rigor-cli` — repo bootstrapped (commit `a1c034f`), bash 3.2 fix (`8ae57bc`), gist installer (`310fd16`); lib-foundation spec: `docs/plans/v0.3.10-rigor-cli-init.md`; rigor-cli specs tracked in that repo (`plans/v0.1.1-mapfile-compat.md`, `plans/v0.1.1-gist-install-script.md`).
 - [ ] `shopping-carts` as consumer (future)
 
 ---
