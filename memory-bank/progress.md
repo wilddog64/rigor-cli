@@ -3,7 +3,7 @@
 ## Overall Status
 
 **v0.1.0 SHIPPED** — PR #1 merged (`f720184`), tagged v0.1.0, GitHub release created 2026-03-24.
-**v0.1.1 ACTIVE** — branch `feat/v0.1.1` cut from main `f720184`.
+**v0.1.1 ACTIVE** — PR #2 merged (`e302af4f`) 2026-03-24 — Scope docs + retro + Copilot PR#2 fixes. Branch `feat/v0.1.1` continues for `mapfile` compat fix.
 
 ---
 
@@ -22,6 +22,7 @@
 - [x] Branch protection on `main` — required status checks + enforce_admins + 1 approving review
 - [x] Copilot PR #1 findings addressed (b96470d): bats-core pinned; .clinerules subtree issue flagged upstream
 - [x] Issue doc: `docs/issues/2026-03-24-copilot-pr1-review-findings.md`
+- [x] PR #2 merged (`e302af4f`) — README Scope section, v0.1.0 retro, Copilot PR#2 findings fixed; enforce_admins restored
 
 ---
 
