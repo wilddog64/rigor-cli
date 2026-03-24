@@ -1,79 +1,137 @@
 # rigor-cli
 
-Standalone CLI for the [lib-foundation](https://github.com/wilddog64/lib-foundation) agent rigor framework. Enforces Bash code quality in any repo — pre-commit hook, CI, or on demand. No Kubernetes dependency.
+Standalone CLI for the [lib-foundation](https://github.com/wilddog64/lib-foundation) agent rigor framework. Enforces Bash code quality in any repo — runs as a pre-commit hook, in CI, or on demand.
 
-## Contents
+Three subcommands cover the full spec-driven workflow: `audit` catches style and security violations at commit time, `lint` runs shellcheck across all shell files in CI, and `checkpoint` creates a safe mid-task save point during development. No Kubernetes dependency — works with any Bash project.
 
-| File | Purpose |
-|---|---|
-| `bin/rigor` | Dispatcher — `checkpoint \| audit \| lint` subcommands |
-| `scripts/lib/foundation/` | lib-foundation git subtree — `_agent_checkpoint`, `_agent_audit`, `_agent_lint` |
-| `scripts/tests/rigor.bats` | BATS test suite |
+---
 
-## Integration
+## Quick Start
 
-Install into your repo via **git subtree**:
+### 1. Add rigor-cli to your repo
 
 ```bash
-# Add as subtree (first time)
+# Add as git subtree (versioned, updatable)
 git subtree add --prefix=.rigor \
   https://github.com/wilddog64/rigor-cli.git main --squash
+```
 
-# Create bin/rigor wrapper
+### 2. Create bin/rigor wrapper
+
+```bash
 mkdir -p bin
 printf '#!/usr/bin/env bash\nexec "$(dirname "${BASH_SOURCE[0]}")/../.rigor/bin/rigor" "$@"\n' \
   > bin/rigor && chmod +x bin/rigor
+```
 
-# Install pre-commit hook
+### 3. Install pre-commit hook
+
+```bash
 printf '#!/usr/bin/env bash\nset -euo pipefail\nbin/rigor audit\n' \
   > .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+```
 
-# Pull updates
+### 4. Verify
+
+```bash
+bin/rigor audit    # should pass on clean working tree
+bin/rigor lint     # shellcheck all .sh files
+```
+
+To update rigor-cli later:
+
+```bash
 git subtree pull --prefix=.rigor \
   https://github.com/wilddog64/rigor-cli.git main --squash
 ```
 
-## Consumers
+---
 
-- [`k3d-manager`](https://github.com/wilddog64/k3d-manager) — local Kubernetes platform manager
-- [`lib-foundation`](https://github.com/wilddog64/lib-foundation) — upstream source library
-
-## Key Contracts
-
-### `rigor audit`
-
-Runs `_agent_audit` on staged `.sh` files. Fails the commit if any staged file contains:
+## Usage
 
 ```bash
-rigor audit    # run on staged .sh files — use as pre-commit hook
+bin/rigor audit               # check staged .sh files — use as pre-commit hook
+bin/rigor lint                # shellcheck all .sh files in the repo
+bin/rigor lint path/to/foo.sh # shellcheck specific file(s)
+bin/rigor checkpoint          # stage all + commit checkpoint (safe mid-task save)
 ```
 
-Checks enforced:
-- If-count ≤ 8 per function (signals need to split)
-- No bare `sudo` — must use `_run_command --interactive-sudo` or `--prefer-sudo`
-- No hardcoded credentials (passwords, tokens, secrets)
-- 2-space indentation — tab or mixed indent fails
+---
 
-### `rigor lint [file…]`
+## What It Checks
 
-Runs `shellcheck` on the specified files, or all `.sh` files in the repo if none given:
+### `rigor audit` — pre-commit enforcement
 
-```bash
-rigor lint                          # shellcheck all .sh files
-rigor lint scripts/lib/system.sh    # shellcheck specific file
-```
+Runs on staged `.sh` files only. Fails the commit if any file contains:
+
+| Check | What Fails |
+|---|---|
+| If-count | Functions with more than 8 `if` statements — split the function |
+| Bare `sudo` | Direct `sudo` calls — use `_run_command --interactive-sudo` or `--prefer-sudo` |
+| Hardcoded credentials | Passwords, tokens, secrets in plain text |
+| Tab indentation | Tab or mixed space+tab indent — enforce 2-space style |
+
+### `rigor lint` — shellcheck
+
+Runs `shellcheck` on specified files or all `.sh` files in the repo. Catches:
+- Unquoted variable expansions
+- Missing `set -euo pipefail`
+- Command injection risks and other shellcheck-detected issues
 
 ### `rigor checkpoint`
 
-Stages all changes and creates a git checkpoint commit:
+Stages all changes (`git add -A`) and creates a checkpoint commit. Use during multi-step development tasks to preserve a known-good state before continuing.
 
-```bash
-rigor checkpoint    # git add -A + git commit (safe mid-task save point)
+---
+
+## Directory Layout
+
+```
+bin/
+  rigor                    # dispatcher (checkpoint | audit | lint)
+scripts/
+  lib/foundation/          # lib-foundation git subtree (DO NOT EDIT)
+  tests/
+    rigor.bats             # BATS test suite
+.github/
+  workflows/
+    ci.yml                 # shellcheck + BATS on every push/PR
 ```
 
-## CI Integration
+---
 
-Add `.github/workflows/rigor.yml` to your repo:
+## Documentation
+
+### Key Contracts
+
+#### `rigor audit`
+
+```bash
+rigor audit    # exits 0 if all staged .sh files pass; non-zero on any violation
+```
+
+Backed by `_agent_audit` from [lib-foundation](https://github.com/wilddog64/lib-foundation/blob/main/scripts/lib/agent_rigor.sh). Only staged files are checked — unstaged changes are ignored.
+
+#### `rigor lint [file…]`
+
+```bash
+rigor lint                          # shellcheck all tracked .sh files
+rigor lint scripts/lib/system.sh    # shellcheck specific file
+```
+
+Defaults to `git ls-files '*.sh'` when no files are specified.
+
+#### `rigor checkpoint`
+
+```bash
+rigor checkpoint    # git add -A + git commit -m "checkpoint: <timestamp>"
+```
+
+Backed by `_agent_checkpoint` from lib-foundation. Requires a clean git repo (not mid-merge).
+
+### CI Integration
+
+Add `.github/workflows/rigor.yml` to your repo to run `rigor lint` on every push and PR:
 
 ```yaml
 name: rigor
