@@ -1,46 +1,67 @@
-# Progress — rigor-cli
+# Progress — lib-foundation
 
 ## Overall Status
 
-**v0.1.0 SHIPPED** — PR #1 merged (`f720184`), tagged v0.1.0, GitHub release created 2026-03-24.
-**v0.1.1 SHIPPED** — PR #4 merged (`c5bda1e`), tagged v0.1.1, GitHub release created 2026-03-25. `enforce_admins` restored.
-**v0.1.2 ACTIVE** — branch `feat/v0.1.2` cut from `c5bda1e`.
+**v0.3.3 SHIPPED** — PR #8 squash-merged (b9f1fda), tagged, GitHub release created 2026-03-16.
+**v0.3.4 SHIPPED** — PR #11 merged to main (`dbfafe9`), tagged v0.3.4, GitHub release created 2026-03-22.
+**v0.3.5 SHIPPED** — PR #10 squash-merged to main (`2f895a99`) 2026-03-23.
+**v0.3.6 SHIPPED** — PR #12 merged to main (`d8b4c48`) 2026-03-23. Tagged v0.3.6, released.
+**v0.3.7 SHIPPED** — PR #13 merged to main (`071c270`) 2026-03-24. Tagged v0.3.7 retroactively, GitHub release created.
+**v0.3.8 SHIPPED** — PR #14 merged to main (`a669a63`) 2026-03-24. Tagged v0.3.8 retroactively, GitHub release created.
+**v0.3.9 SHIPPED** — PR #15 merged to main (`fb09921`) 2026-03-24. No tag (docs-only, no version bump).
+**v0.3.10 SHIPPED** — PR #16 merged to main (`c5662c9`) 2026-03-24. No tag (docs-only, `.clinerules` fix).
+**v0.3.11 SHIPPED** — PR #17 merged to main (`2625683`) 2026-03-25. Tagged v0.3.11, GitHub release created. `enforce_admins` restored.
+**v0.3.12 ACTIVE** — branch `feat/v0.3.12` cut from `2625683`.
+
+## v0.3.12 — Active
+
+- [x] **`_ensure_antigravity_ide` + MCP helpers** — commit `ae0e8b9` adds `_ensure_antigravity_ide`, `_ensure_antigravity_mcp_playwright`, `_antigravity_browser_ready` per `docs/plans/v0.3.12-ensure-antigravity.md`
 
 ---
 
 ## What Is Complete
 
-- [x] GitHub repo created (`wilddog64/rigor-cli`)
-- [x] lib-foundation v0.3.8 subtree added at `scripts/lib/foundation/`
-- [x] `bin/rigor` dispatcher — `checkpoint | audit | lint`
-- [x] BATS test suite — 3 tests (audit pass, audit fail tab-indent, lint fail shellcheck)
-- [x] GitHub Actions CI — shellcheck + BATS; bats-core pinned to v1.11.0
-- [x] Apache 2.0 LICENSE
-- [x] README in k3d-manager format — quick start, what it checks, key contracts, CI integration
-- [x] `.github/copilot-instructions.md`
-- [x] `.clinerules` (repo root)
-- [x] `memory-bank/` initialized
-- [x] Branch protection on `main` — required status checks + enforce_admins + 1 approving review
-- [x] Copilot PR #1 findings addressed (`b96470d`): bats-core pinned; .clinerules subtree issue flagged upstream
-- [x] Issue doc: `docs/issues/2026-03-24-copilot-pr1-review-findings.md`
-- [x] PR #2 merged (`e302af4f`) — README Scope section, v0.1.0 retro, Copilot PR#2 findings fixed; enforce_admins restored
-- [x] mapfile compat fix (`8ae57bc`) — `while IFS= read -r` in `_rigor_shellcheck`
-- [x] Gist-01 install script (`310fd16`) — `docs/gists/gist-01-agent-rigor/install.sh`
-- [x] PR #3 merged (`f304c14`) — mapfile compat + gist-01; Copilot 4 findings fixed; enforce_admins restored
-- [x] lib-foundation subtree pull (`c5662c9`) — `.clinerules` fix lands in subtree
-- [x] Symlink tech debt resolved (`c283d48`) — `_RIGOR_LIB_DIR` updated to real path `scripts/lib/foundation/scripts/lib`
-- [x] Gist published — https://gist.github.com/wilddog64/81c767a0560e39c8d6e0f8bd9706973b
-- [x] PR #4 merged (`c5bda1e`) — v0.1.1 milestone close-out; how-to install doc; Copilot 2 findings fixed
-- [x] v0.1.1 tagged + GitHub release created — 2026-03-25
-- [x] Retro: `docs/retro/2026-03-25-v0.1.1-retrospective.md`
+- [x] GitHub repo + CI + branch protection (v0.1.0)
+- [x] `core.sh` + `system.sh` extracted from k3d-manager (v0.1.0)
+- [x] `_resolve_script_dir` — portable symlink-aware locator + BATS (v0.1.1)
+- [x] Drop Colima support (v0.1.2)
+- [x] `agent_rigor.sh` — `_agent_checkpoint`, `_agent_audit`, `_agent_lint`, pre-commit hook, 13 BATS (v0.2.0)
+- [x] k3d-manager subtree wired at `scripts/lib/foundation/` (k3d-manager v0.7.0)
+- [x] `_run_command` if-count refactor — `_run_command_resolve_sudo` extracted, both < 8 if-blocks (v0.3.0)
+- [x] Bash 3.2 compat — `_RCRS_RUNNER` global temp (v0.3.0)
+- [x] Route bare `sudo` in install helpers through `_run_command --interactive-sudo` (v0.3.1)
+- [x] Fix `_ensure_cargo` WSL redhat branch (v0.3.1)
+- [x] AGENTS.md, GEMINI.md, CLAUDE.md, copilot-instructions.md overhaul (v0.3.1)
+- [x] Sync `deploy_cluster` helpers from k3d-manager; TTY fix (`_DCRS_PROVIDER` global); BATS 36 tests (v0.3.2)
+- [x] Repo flipped **public** (v0.3.2)
+- [x] API reference — `docs/api/functions.md` (v0.3.3)
+- [x] README releases table split — top 3 + `docs/releases.md` full history (v0.3.3)
 
 ---
 
 ## What Is Pending
 
-### v0.1.2 — ACTIVE
+### v0.3.4 — SHIPPED (`dbfafe9`)
 
-_(no items yet)_
+- [x] **Fix `docs/api/functions.md`** — 12 Copilot findings from PR #8 resolved in commit `7bb60c2`; spec `docs/plans/v0.3.4-api-doc-fixes.md`.
+- [x] **Upstream lib sync** — `system.sh` TTY fix (`_run_command_resolve_sudo` + remove `_run_command_has_tty`); `agent_rigor.sh` if-count allowlist + staged-only audit; `statusline.sh` cost display fix.
+- [x] **PR #11 Copilot review** — 8 findings addressed in `08cfbc8`, all threads resolved.
+- [x] **Retro** — `docs/retro/2026-03-22-v0.3.4-retrospective.md`
+
+### v0.3.5 — SHIPPED (`2f895a99`)
+
+- [x] **PR #10 doc-hygiene hook** — `doc_hygiene.sh` + pre-commit hook + BATS 14 tests; staged-only `_agent_audit` BATS test (`bdd60e7`); spec `docs/plans/v0.3.5-agent-audit-staged-only-test.md`.
+- [x] **Doc hygiene staged-content read** — commit `d00bccb` adds `_dh_grep` index reader + new BATS (spec `docs/plans/v0.3.5-doc-hygiene-staged-content-read.md`).
+- [x] **Doc hygiene staged-mode follow-ups** — commit `aeb1396` localizes `_DHC_STAGED`, adds staged `git cat-file` guard, and replaces staged-mode BATS per `docs/plans/v0.3.5-doc-hygiene-copilot-pr10-round2.md`.
+- [x] **PR #10 merged** — squash-merged to main (`2f895a99`) 2026-03-23.
+
+### v0.3.6 — SHIPPED (`d8b4c48`)
+
+- [x] **Check 2 code-fence exclusion** — commit `7751068` adds `_dh_strip_fences`, `_dh_grep --strip-fences`, and 3 BATS covering fenced + tilde blocks (`docs/plans/v0.3.6-doc-hygiene-codefence-exclusion.md`).
+- [x] **CoreDNS Check 4** — commit `c352c1b` adds warn-only `<svc>.<ns>.svc(.cluster.local)` detection and 4 BATS per `docs/plans/v0.3.5-doc-hygiene-coredns-check.md`.
+- [x] **Indented fence fix** — commit `02e7418` updates `_dh_strip_fences` for indented fenced blocks + indented BATS (`docs/plans/v0.3.6-doc-hygiene-indented-fence-fix.md`).
+- [x] `rigor-cli` — repo bootstrapped (commit `a1c034f`, branch feat/init); mapfile compat fix (`8ae57bc`) + gist installer (`310fd16`).
+- [ ] Consumer integration: `shopping-carts`
 
 ---
 
@@ -48,4 +69,9 @@ _(no items yet)_
 
 | Item | Notes |
 |---|---|
-| `scripts/lib/foundation/` | Read-only git subtree — never edit directly |
+| `SCRIPT_DIR` dependency | `system.sh` sources `agent_rigor.sh` via `$SCRIPT_DIR` at load time |
+| Contract stability | `_run_command`, `_detect_platform`, `_cluster_provider` — signature changes require all-consumer coordination |
+| Clean env testing | BATS must run with `env -i` — ambient `SCRIPT_DIR` causes false passes |
+| bash 3.2 compat | No `local -n`, no `declare -A`, no `mapfile` in lib code |
+| `--interactive-sudo` for installs | Install helpers use `--interactive-sudo`; `--prefer-sudo` is for non-interactive contexts only |
+| Global temp vars | `_RCRS_RUNNER` (sudo runner), `_DCRS_PROVIDER` (deploy provider) — never use `$()` for functions that check TTY |

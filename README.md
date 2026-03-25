@@ -1,169 +1,70 @@
-# rigor-cli
+# lib-foundation
 
-Standalone CLI for the [lib-foundation](https://github.com/wilddog64/lib-foundation) agent rigor framework. Enforces Bash code quality in any repo — runs as a pre-commit hook, in CI, or on demand.
+Shared Bash foundation library extracted from [`k3d-manager`](https://github.com/wilddog64/k3d-manager).
 
-Three subcommands cover the full spec-driven workflow: `audit` catches style and security violations at commit time, `lint` runs shellcheck across all shell files in CI, and `checkpoint` creates a safe mid-task save point during development. No Kubernetes dependency — works with any Bash project.
+## Contents
 
-## Scope
+| File | Purpose |
+|---|---|
+| `scripts/lib/core.sh` | Cluster lifecycle operations — create, destroy, deploy, provider abstraction |
+| `scripts/lib/system.sh` | System utilities — `_run_command` privilege model, package helpers, OS detection, BATS install |
+| `scripts/lib/agent_rigor.sh` | Agent audit tooling — `_agent_checkpoint`, `_agent_audit`, `_agent_lint`, pre-commit hook |
 
-rigor-cli enforces quality on **Bash/shell scripts only**. By default it targets files with a `.sh` extension — staged `.sh` files at commit time and `shellcheck` on `.sh` files in CI. Non-shell code (Python, Go, Ruby, etc.) is out of scope — use language-specific linters for those.
+## Integration
 
-If your repo is primarily non-shell, rigor-cli still guards the shell layer: CI scripts, install helpers, and any `.sh` files checked into the repo. Shell scripts without a `.sh` extension (e.g. `bin/rigor` itself) are not picked up automatically — pass them explicitly to `rigor lint` if you want them checked.
-
----
-
-## Quick Start
-
-### 1. Add rigor-cli to your repo
+This library is embedded into consumers via **git subtree**:
 
 ```bash
-# Add as git subtree (versioned, updatable)
-git subtree add --prefix=.rigor \
-  https://github.com/wilddog64/rigor-cli.git main --squash
+# Add as subtree (first time)
+git subtree add --prefix=scripts/lib/foundation \
+  https://github.com/wilddog64/lib-foundation.git main --squash
+
+# Pull updates
+git subtree pull --prefix=scripts/lib/foundation \
+  https://github.com/wilddog64/lib-foundation.git main --squash
 ```
 
-### 2. Create bin/rigor wrapper
+## Consumers
+
+- [`k3d-manager`](https://github.com/wilddog64/k3d-manager) — local Kubernetes platform manager
+- `rigor-cli` — agent audit tooling (planned)
+- `shopping-carts` — app cluster deployment (planned)
+
+## Key Contracts
+
+### `_run_command` (system.sh)
+
+Privilege escalation wrapper. Never call `sudo` directly — use this instead.
 
 ```bash
-mkdir -p bin
-printf '#!/usr/bin/env bash\nexec "$(dirname "${BASH_SOURCE[0]}")/../.rigor/bin/rigor" "$@"\n' \
-  > bin/rigor && chmod +x bin/rigor
+_run_command --interactive-sudo -- apt-get install -y jq  # prompt for sudo if needed (install helpers)
+_run_command --prefer-sudo -- some-cmd                     # sudo if available, else current user (non-interactive)
+_run_command --require-sudo -- mkdir /etc/myapp            # fail if sudo unavailable
+_run_command --probe 'config current-context' -- kubectl get nodes  # probe then decide
+_run_command --quiet -- command_that_might_fail            # suppress stderr, return exit code
 ```
 
-### 3. Install pre-commit hook
+### `_detect_platform` (system.sh)
 
-```bash
-printf '#!/usr/bin/env bash\nset -euo pipefail\nbin/rigor audit\n' \
-  > .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
-```
+Single source of truth for OS detection. Returns: `mac`, `wsl`, `debian`, `redhat`, `linux`.
 
-### 4. Verify
+### `_cluster_provider` (core.sh)
 
-```bash
-bin/rigor audit    # should pass on clean working tree
-bin/rigor lint     # shellcheck all .sh files
-```
+Returns active provider string (`k3d`, `k3s`, `orbstack`). Controlled by
+`CLUSTER_PROVIDER` / `K3D_MANAGER_PROVIDER` / `K3DMGR_PROVIDER`.
 
-To update rigor-cli later:
+## Contributed Scripts and Templates
 
-```bash
-git subtree pull --prefix=.rigor \
-  https://github.com/wilddog64/rigor-cli.git main --squash
-```
+Standalone tools for the spec-driven multi-agent workflow — copy into your repo or
+Claude Code installation. Not part of the Bash library.
 
----
-
-## Usage
-
-```bash
-bin/rigor audit               # check staged .sh and .yaml/.yml files — use as pre-commit hook
-bin/rigor lint                # shellcheck all .sh files in the repo
-bin/rigor lint path/to/foo.sh # shellcheck specific file(s)
-bin/rigor checkpoint          # stage all + commit checkpoint (safe mid-task save)
-```
-
----
-
-## What It Checks
-
-### `rigor audit` — pre-commit enforcement
-
-Runs on staged `.sh` and `.yaml`/`.yml` files. Fails the commit if any file contains:
-
-| Check | Files | What Fails |
+| File | Purpose | Install to |
 |---|---|---|
-| If-count | `.sh` | Functions with more than 8 `if` statements — split the function |
-| Bare `sudo` | `.sh` | Direct `sudo` calls — use `_run_command --interactive-sudo` or `--prefer-sudo` |
-| Hardcoded credentials | `.sh` | Passwords, tokens, secrets in plain text |
-| Tab indentation | `.sh` | Tab or mixed space+tab indent — enforce 2-space style |
-| Hardcoded IP | `.yaml`/`.yml` | IPv4 addresses — use CoreDNS hostname (e.g. `svc.cluster.local`) instead |
+| `scripts/etc/contrib/agent-pickup.sh` | Agent orientation on session start | `bin/agent-pickup.sh` in your repo |
+| `scripts/etc/contrib/handoff-skill.md` | Claude Code `/handoff` skill template | `~/.claude/commands/handoff.md` |
+| `scripts/etc/contrib/statusline.sh` | Claude Code status line | via `/statusline-setup` skill |
 
-### `rigor lint` — shellcheck
-
-Runs `shellcheck` on specified files or all `.sh` files in the repo. Catches:
-- Unquoted variable expansions
-- Missing `set -euo pipefail`
-- Command injection risks and other shellcheck-detected issues
-
-### `rigor checkpoint`
-
-Stages all changes (`git add -A`) and creates a checkpoint commit. Use during multi-step development tasks to preserve a known-good state before continuing.
-
----
-
-## Directory Layout
-
-```
-bin/
-  rigor                    # dispatcher (checkpoint | audit | lint)
-scripts/
-  lib/foundation/          # lib-foundation git subtree (DO NOT EDIT)
-  tests/
-    rigor.bats             # BATS test suite
-.github/
-  workflows/
-    ci.yml                 # shellcheck + BATS on every push/PR
-```
-
----
-
-## Documentation
-
-### How-To
-
-- [Install rigor-cli into any Bash project](docs/howto/install-into-any-repo.md) — one-command install, manual steps, update, scope
-
-### Key Contracts
-
-#### `rigor audit`
-
-```bash
-rigor audit    # exits 0 if all staged .sh and .yaml/.yml files pass; non-zero on any violation
-```
-
-Backed by `_agent_audit` from [lib-foundation](https://github.com/wilddog64/lib-foundation/blob/main/scripts/lib/agent_rigor.sh). Only staged files are checked — unstaged changes are ignored.
-
-#### `rigor lint [file…]`
-
-```bash
-rigor lint                          # shellcheck all tracked .sh files
-rigor lint scripts/lib/system.sh    # shellcheck specific file
-```
-
-Defaults to `git ls-files '*.sh'` when no files are specified.
-
-#### `rigor checkpoint`
-
-```bash
-rigor checkpoint    # git add -A + git commit -m "checkpoint: <timestamp>"
-```
-
-Backed by `_agent_checkpoint` from lib-foundation. Requires a clean git repo (not mid-merge).
-
-### CI Integration
-
-Add `.github/workflows/rigor.yml` to your repo to run `rigor lint` on every push and PR:
-
-```yaml
-name: rigor
-on:
-  push:
-    branches: ["**"]
-  pull_request:
-    branches: [main]
-
-jobs:
-  lint:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install shellcheck
-        run: sudo apt-get install -y shellcheck
-      - name: rigor lint
-        run: bin/rigor lint
-```
+[Full contrib docs →](docs/contrib.md)
 
 ---
 
@@ -172,10 +73,10 @@ jobs:
 ```bash
 # Run BATS tests (requires bats ≥ 1.11) — always use env -i for clean environment
 env -i PATH="/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin" HOME="$HOME" TMPDIR="$TMPDIR" \
-  bash --norc --noprofile -c 'bats scripts/tests/rigor.bats'
+  bash --norc --noprofile -c 'bats scripts/tests/lib/'
 
 # shellcheck
-shellcheck bin/rigor
+shellcheck scripts/lib/core.sh scripts/lib/system.sh
 ```
 
 ## Code Style
@@ -186,17 +87,22 @@ shellcheck bin/rigor
 - Double-quote all variable expansions
 - No bare `sudo` — use `_run_command --interactive-sudo` for install helpers, `--prefer-sudo` for non-interactive contexts
 
-## Requirements
-
-- bash ≥ 3.2
-- git
-- shellcheck (for `rigor lint` — `brew install shellcheck` or `apt-get install shellcheck`)
-
 ---
 
 ## Releases
 
 | Version | Date | Highlights |
 |---|---|---|
-| [v0.1.1](https://github.com/wilddog64/rigor-cli/releases/tag/v0.1.1) | 2026-03-25 | bash 3.2 compat; gist-01 one-command install; subtree path fix; lib-foundation `.clinerules` corrected |
-| [v0.1.0](https://github.com/wilddog64/rigor-cli/releases/tag/v0.1.0) | 2026-03-24 | Initial release — `checkpoint \| audit \| lint` dispatcher; lib-foundation v0.3.8 subtree; BATS 3 tests |
+| [v0.3.11](https://github.com/wilddog64/lib-foundation/releases/tag/v0.3.11) | 2026-03-25 | `_agent_audit` YAML hardcoded-IP check — staged `.yaml`/`.yml` files with IPv4 addresses fail pre-commit |
+| [v0.3.8](https://github.com/wilddog64/lib-foundation/releases/tag/v0.3.8) | 2026-03-24 | `_agent_audit` tab indentation enforcement — staged `.sh` files with tab/mixed indent fail pre-commit; 15 BATS |
+| [v0.3.7](https://github.com/wilddog64/lib-foundation/releases/tag/v0.3.7) | 2026-03-24 | `system.sh` if-count cleanup — extract `_run_command_handle_failure` + `_node_install_via_redhat`; clears k3d-manager allowlist |
+
+<details><summary>Older releases</summary>
+
+| Version | Date | Highlights |
+|---|---|---|
+| [v0.3.6](https://github.com/wilddog64/lib-foundation/releases/tag/v0.3.6) | 2026-03-23 | `doc_hygiene.sh`: exclude fenced code blocks from Check 2; add CoreDNS Check 4 (21 BATS) |
+
+</details>
+
+[Full release history →](docs/releases.md)

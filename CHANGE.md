@@ -1,28 +1,41 @@
-# Changes — rigor-cli
+# Changes - lib-foundation
 
-## [Unreleased] — v0.1.2
+## [Unreleased] — v0.3.12
 
-### Changed
-- `scripts/lib/foundation/`: subtree pulled to lib-foundation v0.3.11 — `_agent_audit` now checks staged `.yaml`/`.yml` files for hardcoded IPv4 addresses and warns to use CoreDNS hostnames
+### Added
+- `_ensure_antigravity_ide()` — install Antigravity IDE via brew (macOS), apt-get (Debian), or dnf (RedHat)
+- `_ensure_antigravity_mcp_playwright()` — inject Playwright MCP entry into Antigravity `mcp_config.json` (requires `jq`; idempotent)
+- `_antigravity_browser_ready()` — verify Antigravity remote debugging port 9222 is listening; configurable timeout
+- `_antigravity_mcp_config_path()` — resolve Antigravity `mcp_config.json` path for macOS/Linux
+
+## [v0.3.11] — 2026-03-25
+
+### Added
+- `scripts/lib/agent_rigor.sh`: YAML hardcoded-IP check in `_agent_audit` — staged `.yaml`/`.yml` files containing IPv4 addresses now fail the pre-commit hook; warns to use CoreDNS hostname instead.
+- `scripts/tests/lib/agent_rigor.bats`: two new tests covering clean YAML (pass) and hardcoded-IP YAML (fail) scenarios.
 
 ---
 
-## [v0.1.1] — 2026-03-25
-
-### Added
-- `docs/retro/2026-03-24-v0.1.0-retrospective.md` — v0.1.0 retrospective
-- README `## Scope` section — clarifies rigor-cli checks shell scripts only; non-shell code is out of scope
-- `docs/gists/gist-01-agent-rigor/install.sh` — one-command install script (https://gist.github.com/wilddog64/81c767a0560e39c8d6e0f8bd9706973b)
+## [Unreleased] — v0.3.10
 
 ### Fixed
-- `bin/rigor`: replace `mapfile` with `while IFS= read -r` in `_rigor_shellcheck` — bash 3.2 compat
-- `bin/rigor`: update `_RIGOR_LIB_DIR` to real subtree path `scripts/lib/foundation/scripts/lib` — removes symlink workaround
+- `.clinerules`: correct `_detect_platform` return values — `mac | wsl | debian | redhat | linux` (was `debian | rhel | arch | darwin | unknown`)
 
 ---
 
-## [v0.1.0] — 2026-03-24
+## [v0.3.8] — _agent_audit tab indentation enforcement
 
 ### Added
-- `bin/rigor` dispatcher — `checkpoint | audit | lint` subcommands
-- lib-foundation v0.3.8 as git subtree at `scripts/lib/foundation/`
-- BATS tests (3): audit pass, audit fail (tab indent), lint fail (shellcheck)
+- `scripts/lib/agent_rigor.sh`: tab indentation check in `_agent_audit` — staged `.sh` files containing tab-indented lines now fail the pre-commit hook; enforces 2-space style across all shell scripts.
+- `scripts/tests/lib/agent_rigor.bats`: two new tests covering tab-indented (fail) and 2-space-indented (pass) scenarios.
+
+### Fixed
+- `scripts/tests/lib/system.bats`: assert exit status in quiet-mode `_run_command_handle_failure` test.
+
+---
+
+## [v0.3.7] — system.sh if-count cleanup
+
+### Changed
+- `scripts/lib/system.sh`: extracted `_run_command_handle_failure` and `_node_install_via_redhat` helpers so `_run_command`/`_ensure_node` drop to ≤8 ifs; clears remaining allowlist entries.
+- `scripts/tests/lib/system.bats`: added coverage for `_run_command_handle_failure` soft/quiet modes and `_node_install_via_redhat` fallback behavior.
