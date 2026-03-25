@@ -1,6 +1,7 @@
-# GitHub Copilot Instructions — rigor-cli
+# GitHub Copilot Instructions — lib-foundation
 
-rigor-cli is a standalone CLI dispatcher over [lib-foundation](https://github.com/wilddog64/lib-foundation)'s agent rigor framework. It exposes three subcommands (`checkpoint`, `audit`, `lint`) backed by `_agent_checkpoint`, `_agent_audit`, and `_agent_lint` from the lib-foundation git subtree at `scripts/lib/foundation/`.
+lib-foundation is a shared Bash library consumed by `k3d-manager`, `rigor-cli`, and `shopping-carts`
+via git subtree. No dispatcher, no cluster — pure Bash with BATS unit tests.
 
 Use the rules below to shape all code suggestions and PR reviews.
 
@@ -8,61 +9,86 @@ Use the rules below to shape all code suggestions and PR reviews.
 
 ## Architecture
 
-- **Dispatcher**: `bin/rigor` — thin bash script, sources lib-foundation, dispatches to `_agent_*` functions
-- **Subtree**: `scripts/lib/foundation/` — lib-foundation copy; **DO NOT EDIT** — all changes go upstream first
-- **Tests**: `scripts/tests/rigor.bats` — always run with `env -i` clean environment
-- **CI**: `.github/workflows/ci.yml` — shellcheck + BATS on every push and PR
+- **Core libraries**: `scripts/lib/system.sh`, `scripts/lib/core.sh`, `scripts/lib/agent_rigor.sh`
+- **Privilege escalation**: always via `_run_command --prefer-sudo` or `--require-sudo` — never bare `sudo`
+- **OS detection**: always via `_detect_platform` — returns `mac | wsl | debian | redhat | linux`
+- **Unit tests**: `scripts/tests/lib/` — always run with `env -i` clean environment
+- **Consumers** pull this repo via `git subtree` — breaking changes require cross-consumer coordination
 
 ---
 
 ## Review Focus
 
-### Supply Chain (OWASP A08) — P1
+### Bash 3.2 Compatibility (P1 — macOS ships /bin/bash 3.2)
 
-- GitHub Actions steps must pin to a version tag (`@v4`) — never `@main` or `@latest`
-- External tools cloned in CI (e.g. bats-core) must pin to a specific release tag — never clone the default branch unversioned
+Flag any of the following as blocking issues:
+
+- **`local -n`** (nameref) — requires bash 4.3+; breaks on macOS. Use a global temp var instead:
+  ```bash
+  # Wrong:
+  local -n _out="$1"
+  # Right: caller declares _MYVAR=(); callee sets _MYVAR=(...); caller reads and unsets
+  ```
+- **`declare -A`** (associative arrays) — not available in bash 3.2
+- **`mapfile`** / **`readarray`** — not available in bash 3.2
+
+### Privilege Escalation
+
+- Bare `sudo` calls in lib code are a bug — all privilege escalation must go through `_run_command`
+- `_run_command -- sudo <cmd>` is also wrong — `sudo` must not appear as a program argument:
+  ```bash
+  # Wrong:
+  _run_command -- sudo apt-get install -y jq
+  # Right:
+  _run_command --prefer-sudo -- apt-get install -y jq
+  ```
+- `--prefer-sudo`: use sudo if available, fall back to current user
+- `--require-sudo`: fail (return 127) if sudo unavailable
+- `--probe '<subcmd>'`: run probe subcommand to decide privilege level
+- Flag bare `sudo` in pipes (e.g. `echo "..." | sudo tee /etc/...`) — wrap with `_run_command --prefer-sudo -- tee`
 
 ### Shell Injection (OWASP A03)
 
 - All variable expansions in command arguments must be double-quoted: `"$var"`, not `$var`
-- Never pass user-supplied input to `eval`
+- Never pass user-supplied or external input to `eval`
 - Use `--` to separate options from arguments where arguments may contain hyphens
 
-### Bash 3.2 Compatibility (macOS ships /bin/bash 3.2)
+### If-Block Complexity
 
-Flag any of the following as blocking issues:
-
-- **`local -n`** (nameref) — requires bash 4.3+; breaks on macOS
-- **`declare -A`** (associative arrays) — not available in bash 3.2
-- **`mapfile`** / **`readarray`** — not available in bash 3.2
-
-Note: `mapfile` is currently used in `bin/rigor`'s `_rigor_shellcheck` for the default-files case. This is a known limitation — acceptable for v0.1.0 since CI runs on Ubuntu; flag if macOS compatibility becomes a requirement.
-
-### Privilege Escalation
-
-- No bare `sudo` in `bin/rigor` or any script outside the lib-foundation subtree
-- Privilege escalation (if ever needed) must use `_run_command --prefer-sudo` or `--require-sudo`
+- `_agent_audit` enforces ≤ 8 if-blocks per function (`AGENT_AUDIT_MAX_IF=8`)
+- Flag functions with deeply nested conditionals — extract helpers to reduce if-count
+- `_run_command` and `_run_command_resolve_sudo` are the primary targets — both must stay under threshold
 
 ### Secret Hygiene (OWASP A02)
 
 - No hardcoded credentials, tokens, or IP addresses in any file
+- New sensitive CLI flags must be registered in `_args_have_sensitive_flag` in `system.sh`
+
+### Supply Chain (OWASP A08)
+
+- GitHub Actions steps must pin to a version tag (`@v4`) — never `@main` or `@latest`
+
+### Idempotency
+
+- Every public function must be safe to run more than once
+- "Resource already exists" → skip, not error
 
 ---
 
 ## Skip / Do Not Flag
 
-- Any file under `scripts/lib/foundation/` — this is a read-only git subtree; upstream changes belong in lib-foundation
+- Pre-existing `shellcheck` warnings in lines **not changed** by the PR
 - `set -euo pipefail` absence in sourced library files — these are sourced, not executed directly
-- Test stubs and helper overrides in `scripts/tests/` — intentionally override production functions
-- `shellcheck disable=SC1091` directives in `bin/rigor` — sourced paths are dynamic, suppression is intentional
+- Test stubs and helper overrides in `scripts/tests/` — these intentionally override production functions
+- `_RCRS_RUNNER` global temp variable pattern — this is the intentional bash 3.2 compat replacement for `local -n`
+- `sudo -n` inside `_run_command_resolve_sudo` — this is the internals of the privilege resolver, not a bare sudo call
 
 ---
 
 ## Code Style
 
-- `set -euo pipefail` on all new scripts
 - Public functions: no leading underscore
 - Private/helper functions: prefix with `_`
-- Double-quote all variable expansions
+- All new bash scripts must have `set -euo pipefail`
 - LF line endings only — no CRLF
 - No inline comments unless logic is non-obvious
