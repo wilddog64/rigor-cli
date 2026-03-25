@@ -1,6 +1,6 @@
 # Changes — rigor-cli
 
-## [v0.1.1] — 2026-03-24
+## [Unreleased] — v0.1.1
 
 ### Added
 - `docs/retro/2026-03-24-v0.1.0-retrospective.md` — v0.1.0 retrospective
