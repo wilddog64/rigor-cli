@@ -7,7 +7,9 @@
 **PR #3 MERGED** — `f304c14` 2026-03-24 — mapfile compat + gist-01; Copilot 4 findings fixed; enforce_admins restored.
 **PR #4 MERGED** — `c5bda1e` 2026-03-25 — v0.1.1 milestone close-out; symlink debt resolved; how-to doc; Copilot 2 findings fixed. `enforce_admins` restored.
 **v0.1.1 SHIPPED** — tagged `c5bda1e`, GitHub release created 2026-03-25.
-**feat/v0.1.2 ACTIVE** — branch cut from `c5bda1e`.
+**PR #5 MERGED** — `5ed7f8d` 2026-03-25 — v0.1.2 lib-foundation v0.3.11 subtree pull; YAML IP audit; Copilot 2 findings fixed. `enforce_admins` restored.
+**v0.1.2 SHIPPED** — tagged `5ed7f8d`, GitHub release created 2026-03-25.
+**feat/v0.1.3 ACTIVE** — branch cut from `5ed7f8d`.
 
 ---
 
@@ -28,7 +30,8 @@ lib-foundation consumed via git subtree at `scripts/lib/foundation/`.
 |---|---|---|
 | v0.1.0 | **SHIPPED** | PR #1 merged (`f720184`) — initial dispatcher + subtree + BATS 3 tests; 2026-03-24; tagged v0.1.0 |
 | v0.1.1 | **SHIPPED** | PR #4 merged (`c5bda1e`) — bash 3.2 compat, gist-01 install, subtree path fix; 2026-03-25; tagged v0.1.1 |
-| v0.1.2 | **ACTIVE** | branch `feat/v0.1.2` cut from `c5bda1e` |
+| v0.1.2 | **SHIPPED** | PR #5 merged (`5ed7f8d`) — lib-foundation v0.3.11 subtree pull, YAML IP audit; 2026-03-25; tagged v0.1.2 |
+| v0.1.3 | **ACTIVE** | branch `feat/v0.1.3` cut from `5ed7f8d` |
 
 ---
 
