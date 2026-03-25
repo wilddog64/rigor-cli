@@ -56,7 +56,7 @@ git subtree pull --prefix=.rigor \
 ## Usage
 
 ```bash
-bin/rigor audit               # check staged .sh files — use as pre-commit hook
+bin/rigor audit               # check staged .sh and .yaml/.yml files — use as pre-commit hook
 bin/rigor lint                # shellcheck all .sh files in the repo
 bin/rigor lint path/to/foo.sh # shellcheck specific file(s)
 bin/rigor checkpoint          # stage all + commit checkpoint (safe mid-task save)
@@ -68,14 +68,15 @@ bin/rigor checkpoint          # stage all + commit checkpoint (safe mid-task sav
 
 ### `rigor audit` — pre-commit enforcement
 
-Runs on staged `.sh` files only. Fails the commit if any file contains:
+Runs on staged `.sh` and `.yaml`/`.yml` files. Fails the commit if any file contains:
 
-| Check | What Fails |
-|---|---|
-| If-count | Functions with more than 8 `if` statements — split the function |
-| Bare `sudo` | Direct `sudo` calls — use `_run_command --interactive-sudo` or `--prefer-sudo` |
-| Hardcoded credentials | Passwords, tokens, secrets in plain text |
-| Tab indentation | Tab or mixed space+tab indent — enforce 2-space style |
+| Check | Files | What Fails |
+|---|---|---|
+| If-count | `.sh` | Functions with more than 8 `if` statements — split the function |
+| Bare `sudo` | `.sh` | Direct `sudo` calls — use `_run_command --interactive-sudo` or `--prefer-sudo` |
+| Hardcoded credentials | `.sh` | Passwords, tokens, secrets in plain text |
+| Tab indentation | `.sh` | Tab or mixed space+tab indent — enforce 2-space style |
+| Hardcoded IP | `.yaml`/`.yml` | IPv4 addresses — use CoreDNS hostname (e.g. `svc.cluster.local`) instead |
 
 ### `rigor lint` — shellcheck
 
@@ -117,7 +118,7 @@ scripts/
 #### `rigor audit`
 
 ```bash
-rigor audit    # exits 0 if all staged .sh files pass; non-zero on any violation
+rigor audit    # exits 0 if all staged .sh and .yaml/.yml files pass; non-zero on any violation
 ```
 
 Backed by `_agent_audit` from [lib-foundation](https://github.com/wilddog64/lib-foundation/blob/main/scripts/lib/agent_rigor.sh). Only staged files are checked — unstaged changes are ignored.
