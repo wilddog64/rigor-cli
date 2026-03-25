@@ -16,7 +16,7 @@ _rigor_usage() {
   echo ""
   echo "Commands:"
   echo "  checkpoint          Stage all changes and create a git checkpoint commit"
-  echo "  audit               Run agent audit checks on staged .sh files"
+  echo "  audit               Run agent audit checks on staged .sh and .yaml/.yml files"
   echo "  lint [file…]        Run shellcheck on specified files (default: all .sh)"
   exit 1
 }

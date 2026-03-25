@@ -3,7 +3,8 @@
 ## Overall Status
 
 **v0.1.0 SHIPPED** — PR #1 merged (`f720184`), tagged v0.1.0, GitHub release created 2026-03-24.
-**v0.1.1 ACTIVE** — PR #4 open — milestone close-out; all items complete pending merge.
+**v0.1.1 SHIPPED** — PR #4 merged (`c5bda1e`), tagged v0.1.1, GitHub release created 2026-03-25. `enforce_admins` restored.
+**v0.1.2 ACTIVE** — branch `feat/v0.1.2` cut from `c5bda1e`.
 
 ---
 
@@ -29,14 +30,17 @@
 - [x] lib-foundation subtree pull (`c5662c9`) — `.clinerules` fix lands in subtree
 - [x] Symlink tech debt resolved (`c283d48`) — `_RIGOR_LIB_DIR` updated to real path `scripts/lib/foundation/scripts/lib`
 - [x] Gist published — https://gist.github.com/wilddog64/81c767a0560e39c8d6e0f8bd9706973b
+- [x] PR #4 merged (`c5bda1e`) — v0.1.1 milestone close-out; how-to install doc; Copilot 2 findings fixed
+- [x] v0.1.1 tagged + GitHub release created — 2026-03-25
+- [x] Retro: `docs/retro/2026-03-25-v0.1.1-retrospective.md`
 
 ---
 
 ## What Is Pending
 
-### v0.1.1 — ACTIVE (PR #4 open)
+### v0.1.2 — ACTIVE
 
-- [ ] PR #4 merge + v0.1.1 tag + GitHub release
+_(no items yet)_
 
 ---
 
