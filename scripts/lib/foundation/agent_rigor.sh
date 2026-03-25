@@ -1,1 +1,0 @@
-scripts/lib/agent_rigor.sh

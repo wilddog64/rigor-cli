@@ -5,7 +5,7 @@ Adds [rigor-cli](https://github.com/wilddog64/rigor-cli) to any Bash project.
 ## Usage
 
 ```bash
-curl -fsSL https://gist.githubusercontent.com/wilddog64/<gist-id>/raw/install.sh | bash
+curl -fsSL https://gist.githubusercontent.com/wilddog64/81c767a0560e39c8d6e0f8bd9706973b/raw/install.sh | bash
 # or clone + run manually:
 bash install.sh --ci     # also write .github/workflows/rigor.yml
 bash install.sh --no-ci  # skip CI workflow
@@ -17,7 +17,7 @@ bash install.sh --no-ci  # skip CI workflow
 |------|--------|
 | git subtree add | `.rigor/` — versioned, updatable |
 | bin/rigor wrapper | `bin/rigor` subcommands: `checkpoint`, `audit`, `lint` |
-| pre-commit hook | `.git/hooks/pre-commit` — runs `rigor audit` |
+| pre-commit hook | resolves `core.hooksPath`; runs `rigor audit` on staged `.sh` files |
 | CI workflow (optional) | `.github/workflows/rigor.yml` — shellcheck on every push/PR |
 
 ## Update later

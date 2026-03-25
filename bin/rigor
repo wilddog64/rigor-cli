@@ -2,13 +2,13 @@
 set -euo pipefail
 
 _RIGOR_BIN_DIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-_RIGOR_LIB_DIR="${_RIGOR_BIN_DIR}/../scripts/lib/foundation"
+_RIGOR_LIB_DIR="${_RIGOR_BIN_DIR}/../scripts/lib/foundation/scripts/lib"
 
 # shellcheck disable=SC1091
-# shellcheck source=../scripts/lib/foundation/system.sh
+# shellcheck source=../scripts/lib/foundation/scripts/lib/system.sh
 source "${_RIGOR_LIB_DIR}/system.sh"
 # shellcheck disable=SC1091
-# shellcheck source=../scripts/lib/foundation/agent_rigor.sh
+# shellcheck source=../scripts/lib/foundation/scripts/lib/agent_rigor.sh
 source "${_RIGOR_LIB_DIR}/agent_rigor.sh"
 
 _rigor_usage() {

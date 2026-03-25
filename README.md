@@ -108,6 +108,10 @@ scripts/
 
 ## Documentation
 
+### How-To
+
+- [Install rigor-cli into any Bash project](docs/howto/install-into-any-repo.md) — one-command install, manual steps, update, scope
+
 ### Key Contracts
 
 #### `rigor audit`
@@ -193,4 +197,5 @@ shellcheck bin/rigor
 
 | Version | Date | Highlights |
 |---|---|---|
+| v0.1.1 _(unreleased)_ | 2026-03-24 | bash 3.2 compat; gist-01 one-command install; subtree path fix; lib-foundation `.clinerules` corrected |
 | [v0.1.0](https://github.com/wilddog64/rigor-cli/releases/tag/v0.1.0) | 2026-03-24 | Initial release — `checkpoint \| audit \| lint` dispatcher; lib-foundation v0.3.8 subtree; BATS 3 tests |
