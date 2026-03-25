@@ -1,5 +1,12 @@
 # Changes — rigor-cli
 
+## [Unreleased] — v0.1.2
+
+### Changed
+- `scripts/lib/foundation/`: subtree pulled to lib-foundation v0.3.11 — `_agent_audit` now checks staged `.yaml`/`.yml` files for hardcoded IPv4 addresses and warns to use CoreDNS hostnames
+
+---
+
 ## [v0.1.1] — 2026-03-25
 
 ### Added
