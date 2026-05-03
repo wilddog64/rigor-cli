@@ -41,9 +41,9 @@
 
 ## What Is Pending
 
-### v0.1.2 — ACTIVE
+### v0.1.3 — ACTIVE
 
-_(no items yet)_
+_(all items complete — pending PR + merge)_
 
 ---
 

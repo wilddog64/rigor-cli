@@ -17,10 +17,11 @@
 
 ## Purpose
 
-Standalone CLI exposing lib-foundation's agent rigor framework as three subcommands:
+Standalone CLI exposing lib-foundation's agent rigor framework as four subcommands:
 - `bin/rigor checkpoint` — `_agent_checkpoint`: stage all + commit
 - `bin/rigor audit` — `_agent_audit`: staged .sh file checks (if-count, bare sudo, credentials, tab indent)
 - `bin/rigor lint` — `_agent_lint` / shellcheck: all .sh files in repo
+- `bin/rigor review` — `_ai_agent_review`: AI-assisted review via configured backend (default: Copilot)
 
 lib-foundation consumed via git subtree at `scripts/lib/foundation/`.
 
