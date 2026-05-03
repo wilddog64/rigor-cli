@@ -6,7 +6,7 @@
 **v0.1.1 SHIPPED** — PR #4 merged (`c5bda1e`), tagged v0.1.1, GitHub release created 2026-03-25. `enforce_admins` restored.
 **v0.1.2 SHIPPED** — PR #5 merged (`5ed7f8d`), tagged v0.1.2, GitHub release created 2026-03-25. `enforce_admins` restored.
 **v0.1.3 SHIPPED** — PR #6 merged (`675f6e9`), tagged `306cd86`, GitHub release created 2026-05-03. `enforce_admins` restored.
-**v0.1.4 ACTIVE** — branch `feat/v0.1.4` cut from `306cd86`.
+**v0.1.4 ACTIVE** — branch `feat/v0.1.4` cut from `306cd86`. Spec implemented: `docs/plans/v0.1.4-multi-language-lint.md`. Commit `a4d9771` pushed.
 
 ---
 
@@ -47,7 +47,7 @@
 
 ### v0.1.4 — ACTIVE
 
-- [ ] Multi-language lint — `RIGOR_LINT_BACKENDS` dispatch; spec `docs/plans/v0.1.4-multi-language-lint.md`; assigned to Codex
+- [x] Multi-language lint — `RIGOR_LINT_BACKENDS` dispatch; spec `docs/plans/v0.1.4-multi-language-lint.md`; commit `a4d9771`
 
 ---
 
