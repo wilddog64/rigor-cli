@@ -5,7 +5,7 @@
 **v0.1.0 SHIPPED** — PR #1 merged (`f720184`), tagged v0.1.0, GitHub release created 2026-03-24.
 **v0.1.1 SHIPPED** — PR #4 merged (`c5bda1e`), tagged v0.1.1, GitHub release created 2026-03-25. `enforce_admins` restored.
 **v0.1.2 SHIPPED** — PR #5 merged (`5ed7f8d`), tagged v0.1.2, GitHub release created 2026-03-25. `enforce_admins` restored.
-**v0.1.3 ACTIVE** — branch `feat/v0.1.3` cut from `5ed7f8d`.
+**v0.1.3 ACTIVE** — branch `feat/v0.1.3`. Spec written: `docs/plans/v0.1.3-rigor-review.md`. Next: subtree pull lib-foundation v0.3.19, then implement `rigor review`.
 
 ---
 

@@ -9,7 +9,7 @@
 **v0.1.1 SHIPPED** — tagged `c5bda1e`, GitHub release created 2026-03-25.
 **PR #5 MERGED** — `5ed7f8d` 2026-03-25 — v0.1.2 lib-foundation v0.3.11 subtree pull; YAML IP audit; Copilot 2 findings fixed. `enforce_admins` restored.
 **v0.1.2 SHIPPED** — tagged `5ed7f8d`, GitHub release created 2026-03-25.
-**feat/v0.1.3 ACTIVE** — branch cut from `5ed7f8d`.
+**feat/v0.1.3 ACTIVE** — branch cut from `5ed7f8d`. Current work: `rigor review` subcommand. Spec: `docs/plans/v0.1.3-rigor-review.md`. Prerequisite: subtree pull lib-foundation v0.3.19 (has `_ai_agent_review`; embedded subtree is at v0.3.15).
 
 ---
 
