@@ -82,3 +82,12 @@ teardown() {
   [[ "$output" == *"mock-ruff"* ]]
   [[ "$output" != *"shellcheck"* ]]
 }
+
+@test "rigor lint: extensionless explicit file is silently skipped" {
+  cd "$BATS_TEST_TMPDIR" || exit 1
+  printf '#!/usr/bin/env bash\necho "hello"\n' > bin/myscript
+  chmod +x bin/myscript
+  run bin/rigor lint bin/myscript
+  [ "$status" -eq 0 ]
+  [[ "$output" != *"shellcheck"* ]]
+}

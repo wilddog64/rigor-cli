@@ -1,6 +1,6 @@
 # GitHub Copilot Instructions — rigor-cli
 
-rigor-cli is a standalone CLI dispatcher over [lib-foundation](https://github.com/wilddog64/lib-foundation)'s agent rigor framework. It exposes four subcommands (`checkpoint`, `audit`, `lint`, `review`) backed by `_agent_checkpoint`, `_agent_audit`, `_agent_lint`, and `_ai_agent_review` from the lib-foundation git subtree at `scripts/lib/foundation/`.
+rigor-cli is a standalone CLI dispatcher over [lib-foundation](https://github.com/wilddog64/lib-foundation)'s agent rigor framework. It exposes four subcommands (`checkpoint`, `audit`, `lint`, `review`) — `checkpoint`, `audit`, and `review` are backed by `_agent_checkpoint`, `_agent_audit`, and `_ai_agent_review` from the lib-foundation git subtree at `scripts/lib/foundation/`; `lint` dispatches per-extension via `_rigor_lint` in `bin/rigor` itself.
 
 Use the rules below to shape all code suggestions and PR reviews.
 

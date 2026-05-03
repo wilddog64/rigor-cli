@@ -12,7 +12,7 @@ rigor-cli enforces quality across **any language** via three mechanisms:
 - **`rigor lint`** — runs configured static analysis backends per extension. Default: `shellcheck` on `.sh`. Configure additional languages via `RIGOR_LINT_BACKENDS`.
 - **`rigor review`** — AI-assisted review for any staged content, regardless of language.
 
-Shell scripts without a `.sh` extension (e.g. `bin/rigor` itself) are not picked up automatically — pass them explicitly to `rigor lint` if you want them checked.
+Shell scripts without a `.sh` extension (e.g. `bin/rigor` itself) are not supported by `rigor lint` — extension matching is required. Use `shellcheck` directly for extensionless scripts.
 
 ---
 
