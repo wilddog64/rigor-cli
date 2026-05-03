@@ -212,7 +212,7 @@ shellcheck bin/rigor
 
 | Version | Date | Highlights |
 |---|---|---|
-| [v0.1.3](https://github.com/wilddog64/rigor-cli/tree/feat/v0.1.3) | 2026-05-03 | `review` subcommand via `_ai_agent_review`; lib-foundation v0.3.19 subtree pull |
+| [v0.1.3](https://github.com/wilddog64/rigor-cli/releases/tag/v0.1.3) | 2026-05-03 | `review` subcommand via `_ai_agent_review`; lib-foundation v0.3.20 subtree pull |
 | [v0.1.2](https://github.com/wilddog64/rigor-cli/releases/tag/v0.1.2) | 2026-03-25 | lib-foundation v0.3.11 subtree pull — `audit` now checks staged `.yaml`/`.yml` for hardcoded IPs |
 | [v0.1.1](https://github.com/wilddog64/rigor-cli/releases/tag/v0.1.1) | 2026-03-25 | bash 3.2 compat; gist-01 one-command install; subtree path fix; lib-foundation `.clinerules` corrected |
 
