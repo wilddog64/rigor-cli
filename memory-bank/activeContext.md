@@ -11,6 +11,11 @@
 **v0.1.2 SHIPPED** — tagged `5ed7f8d`, GitHub release created 2026-03-25.
 **PR #6 MERGED** — `675f6e9` 2026-05-03 — `rigor review` subcommand; lib-foundation v0.3.20 subtree pull; Copilot 4 findings fixed. `enforce_admins` restored.
 **v0.1.3 SHIPPED** — tagged `306cd86`, GitHub release created 2026-05-03. `enforce_admins` restored.
+**feat/v0.1.4 ACTIVE** — spec written: `docs/plans/v0.1.4-multi-language-lint.md`. Assigned to Codex.
+
+## v0.1.4 Open Items
+
+- [ ] **Multi-language lint via `RIGOR_LINT_BACKENDS`** — `_rigor_lint` replaces `_rigor_shellcheck`; OPEN. Spec: `docs/plans/v0.1.4-multi-language-lint.md`.
 
 ---
 

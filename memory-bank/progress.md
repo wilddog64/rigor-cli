@@ -47,7 +47,7 @@
 
 ### v0.1.4 — ACTIVE
 
-_(no items yet)_
+- [ ] Multi-language lint — `RIGOR_LINT_BACKENDS` dispatch; spec `docs/plans/v0.1.4-multi-language-lint.md`; assigned to Codex
 
 ---
 
