@@ -1,14 +1,13 @@
 # Active Context — lib-foundation
 
-## Current State: `feat/v0.3.10` (as of 2026-03-24)
+## Current State: `fix/copilot-deny-tool-patterns` (as of 2026-05-02)
 
-**v0.3.4 SHIPPED** — PR #11 merged to main (`dbfafe9`), tagged v0.3.4, GitHub release created 2026-03-22.
-**v0.3.5 SHIPPED** — PR #10 squash-merged to main (`2f895a99`) 2026-03-23. No tag (no CHANGELOG entry). `enforce_admins` restored.
-**v0.3.6 SHIPPED** — PR #12 merged to main (`d8b4c48`) 2026-03-23. Tagged v0.3.6, GitHub release created. `enforce_admins` restored.
-**v0.3.7 SHIPPED** — PR #13 merged to main (`071c270`) 2026-03-24. Tagged v0.3.7 retroactively, GitHub release created. system.sh if-count cleanup.
-**v0.3.8 SHIPPED** — PR #14 merged to main (`a669a63`) 2026-03-24. Tagged v0.3.8 retroactively, GitHub release created. Tab indentation enforcement in `_agent_audit`.
-**v0.3.9 SHIPPED** — PR #15 merged to main (`fb09921`) 2026-03-24. No tag (docs-only, no version bump). Release history backfill + memory-bank reconciliation. `enforce_admins` restored.
-**feat/v0.3.10 ACTIVE** — branch cut from main `fb09921` 2026-03-24. `_detect_platform` contract corrected in `.clinerules` (`efb22e9`). `enforce_admins` restored.
+**v0.3.11 SHIPPED** — PR #17 merged to main (`2625683`) 2026-03-25. Tagged v0.3.11, GitHub release created. `enforce_admins` restored.
+**v0.3.12 SHIPPED** — PR #18 squash-merged to main (`91340d62`) 2026-03-25. Tagged v0.3.12, GitHub release created. `enforce_admins` restored. Antigravity IDE install + Playwright MCP config helpers.
+**v0.3.13 SHIPPED** — PR #19 squash-merged to main (`e870c6d9`) 2026-03-25. Tagged v0.3.13, GitHub release created. `enforce_admins` restored. Fix `_antigravity_browser_ready` curl probe (`_run_command --soft`).
+**v0.3.14 SHIPPED** — PR #20 squash-merged to main (`bbbaf053`) 2026-03-27. Tagged v0.3.14, GitHub release created. `enforce_admins` restored. 5 deferred Copilot PR #51 findings: agy binary detection, curl fast-fail, NUL audit loops, doc fix, CHANGE.md versioning.
+**feat/v0.3.18 ACTIVE** — `_copilot_auth_check` rewrite; PR #25 open.
+**fix/copilot-deny-tool-patterns DONE** — combined `--allow-all-tools` + deny-tool fix; commit `713c18e`. Spec: `docs/bugs/2026-05-02-copilot-review-noninteractive-combined-fix.md`.
 
 ---
 
@@ -35,12 +34,24 @@ API reference: `docs/api/functions.md`
 | v0.3.7 | **SHIPPED** | PR #13 merged (`071c270`) — system.sh if-count cleanup; 2026-03-24; tagged v0.3.7 retroactively |
 | v0.3.8 | **SHIPPED** | PR #14 merged (`a669a63`) — tab indentation enforcement in `_agent_audit`; 2026-03-24; tagged v0.3.8 retroactively |
 | v0.3.9 | **SHIPPED** | PR #15 merged (`fb09921`) — release history backfill + memory-bank reconciliation; 2026-03-24; no tag (docs-only) |
-| v0.3.10 | **ACTIVE** | branch `feat/v0.3.10` cut from main `fb09921` |
-| v0.3.11 | **PLANNED** | `_agent_audit` YAML hardcoded-IP check; spec `docs/plans/v0.3.11-agent-audit-yaml-ip-check.md` |
+| v0.3.10 | **SHIPPED** | PR #16 merged (`c5662c9`) — `.clinerules` fix; 2026-03-24; no tag (docs-only) |
+| v0.3.11 | **SHIPPED** | PR #17 merged (`2625683`) — YAML IP check in `_agent_audit`; 2026-03-25; tagged v0.3.11 |
+| v0.3.12 | **SHIPPED** | PR #18 merged (`91340d62`) — Antigravity IDE + MCP helpers; 7 BATS; 2026-03-25; tagged v0.3.12 |
+| v0.3.13 | **SHIPPED** | PR #19 merged (`e870c6d9`) — `_antigravity_browser_ready` curl probe fix; 2026-03-25; tagged v0.3.13 |
+| v0.3.14 | **SHIPPED** | PR #20 merged (`bbbaf053`) 2026-03-27 |
+| v0.3.15–v0.3.17 | **SHIPPED** | PRs #21–#24 merged; v0.3.17 at `108924b9` 2026-05-01 |
+| v0.3.18 | **IN PROGRESS** | branch `feat/v0.3.18`; PR #25 open |
 
 ---
 
-## Open Items
+## v0.3.18 Open Items
+
+- [x] **Bugfix: `_copilot_auth_check` K3DM_ENABLE_AI gate** — DONE (`f0e29d9`, `eede5c3`). Spec: `docs/plans/v0.3.18-bugfix-copilot-auth-preflight.md`. Removed `K3DM_ENABLE_AI` gate; checks env tokens → `~/.config/github-copilot/apps.json` → `gh auth status`; clear error on failure. New `scripts/tests/lib/copilot_auth.bats` (6 tests).
+- [ ] **Copilot review non-interactive permissions** — OPEN. `docs/issues/2026-05-02-copilot-review-noninteractive-permissions.md`. `_copilot_review` still emits a non-interactive Copilot call without the CLI permission mode the help text describes as required.
+
+---
+
+## Pre-v0.3.18 Open Items
 
 - [x] **PR #10 doc-hygiene hook** — staged-only `_agent_audit` BATS test added in commit `bdd60e7`; spec `docs/plans/v0.3.5-agent-audit-staged-only-test.md`. Branch: `feat/doc-hygiene-hook`.
 - [x] **Doc hygiene staged-content read** — commit `d00bccb` implements `_dh_grep` index reader per `docs/plans/v0.3.5-doc-hygiene-staged-content-read.md`; branch pushed `feat/doc-hygiene-hook`.
@@ -51,6 +62,14 @@ API reference: `docs/api/functions.md`
 - [x] **v0.3.6: indented fence fix** — commit `02e7418` updates `_dh_strip_fences` to handle indented fences + adds indented BATS per `docs/plans/v0.3.6-doc-hygiene-indented-fence-fix.md`.
 - [x] **v0.3.11: YAML hardcoded IP check** — commit `11e653b` adds staged `.yaml/.yml` IP detection to `_agent_audit` per `docs/plans/v0.3.11-agent-audit-yaml-ip-check.md`.
 - [x] `rigor-cli` — repo bootstrapped (commit `a1c034f`), bash 3.2 fix (`8ae57bc`), gist installer (`310fd16`); lib-foundation spec: `docs/plans/v0.3.10-rigor-cli-init.md`; rigor-cli specs tracked in that repo (`plans/v0.1.1-mapfile-compat.md`, `plans/v0.1.1-gist-install-script.md`).
+- [x] **v0.3.12: Antigravity helpers** — commit `ae0e8b9` adds `_ensure_antigravity_ide`, `_ensure_antigravity_mcp_playwright`, `_antigravity_browser_ready` per `docs/plans/v0.3.12-ensure-antigravity.md`.
+- [x] **v0.3.13: antigravity browser probe fix** — commit `9350ecd` switches `_antigravity_browser_ready` to `_run_command --soft -- curl` per `docs/plans/v0.3.13-antigravity-browser-ready-fix.md`.
+- [x] **v0.3.14: k3d-manager Copilot PR #51 deferred findings** — `e52b819` fixes all 5 upstream gaps per `docs/plans/v0.3.14-copilot-pr51-deferred-fixes.md`:
+  - `_ensure_antigravity_ide` now detects `agy` binaries first
+  - `_antigravity_browser_ready` fails fast when `curl` missing
+  - `_agent_audit` tab scan iterates staged files via NUL-delimited loop
+  - `docs/api/functions.md` explains `PLAYWRIGHT_MCP_VERSION` pinned MCP default
+  - `CHANGE.md` versions the v0.3.12/v0.3.13 release notes
 - [ ] `shopping-carts` as consumer (future)
 
 ---
@@ -70,8 +89,8 @@ API reference: `docs/api/functions.md`
 
 | Repo | Integration | Status |
 |---|---|---|
-| `k3d-manager` | git subtree at `scripts/lib/foundation/` | on v0.3.2; v0.3.3 pull pending |
-| `rigor-cli` | git subtree (planned) | separate repo, future |
+| `k3d-manager` | git subtree at `scripts/lib/foundation/` | subtree pull to v0.3.13 pending |
+| `rigor-cli` | git subtree at `scripts/lib/foundation/` | subtree pull to v0.3.13 pending |
 | `shopping-carts` | git subtree (planned) | future |
 
 ---

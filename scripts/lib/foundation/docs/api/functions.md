@@ -82,6 +82,66 @@ source "$(dirname "$0")/lib/agent_rigor.sh"
 | `_ensure_cargo` | Install Rust `cargo` via apt/dnf/homebrew. |
 | `_ensure_copilot_cli` | Ensures the Copilot CLI binary is installed (via `brew install copilot-cli` or the official release installer) and authenticated (`_copilot_auth_check`). Exits via `_err` if installation fails. |
 
+### Copilot CLI Integration
+
+`_copilot_auth_check` runs unconditionally — no feature gate. Checks `COPILOT_GITHUB_TOKEN`/`GH_TOKEN`/`GITHUB_TOKEN` env tokens, then `~/.config/github-copilot/apps.json`, then `gh auth status`. Callers are responsible for feature-gating if needed.
+
+| Function | Description |
+|---|---|
+| `_copilot_auth_check` | Verify Copilot auth: checks env tokens → `apps.json` → `gh auth status`; calls `_err` if all checks fail. |
+| `_copilot_scope_prompt <text>` | Prepend a k3d-manager repo scope statement to `<text>` before passing to Copilot. |
+| `_copilot_prompt_guard <text>` | Block prompts containing forbidden fragments (`shell(git push)`, `shell(rm`, `shell(eval`, `shell(sudo`, `shell(curl`, `shell(wget`, `shell(cd`). Calls `_err` on match. |
+| `_copilot_review [--prompt\|-p <text>] [--model <id>] [<flags>...]` | Sandboxed Copilot CLI wrapper. Scopes the prompt, applies the prompt guard, runs from repo root, and passes `--deny-tool` flags for all forbidden shell operations. Returns Copilot's exit code. |
+| `_ai_agent_review [--prompt\|-p <text>] [<flags>...]` | Generic AI dispatch wrapper. Reads `AI_REVIEW_FUNC` (default: `copilot`) to select backend and `AI_REVIEW_MODEL` (default: `gpt-5.4-mini`) for model. Currently supports `copilot` only; additional backends are added as new `case` branches. Passes all args through to the selected backend. |
+
+**`_copilot_review` usage:**
+
+```bash
+source scripts/lib/system.sh
+
+# Basic prompt
+_copilot_review --prompt "Explain the _agent_lint flow in this repo."
+
+# With model override
+_copilot_review --prompt "Review staged shell changes for injection risks." \
+  --model claude-sonnet-4-5
+
+# Pipe external context into the prompt
+context="$(kubectl describe pod -n vault vault-0 2>&1)"
+_copilot_review --prompt "Diagnose this pod failure:\n\n${context}"
+```
+
+**`_ai_agent_review` env vars:**
+
+| Env Var | Default | Description |
+|---|---|---|
+| `AI_REVIEW_FUNC` | `copilot` | AI backend to use. Currently only `copilot` is supported. |
+| `AI_REVIEW_MODEL` | `gpt-5.4-mini` | Default model passed to the backend. An explicit `--model` in args takes precedence over this env default. |
+
+**Using in another project via subtree:**
+
+```bash
+# Pull lib-foundation
+git subtree add --prefix scripts/lib/foundation \
+  https://github.com/wilddog64/lib-foundation.git main --squash
+
+# Source and use
+source scripts/lib/foundation/scripts/lib/system.sh
+_ai_agent_review --prompt "Your prompt here."
+```
+
+> **Note:** `_copilot_scope_prompt` hardcodes "k3d-manager repository" in the scope header it prepends to every prompt. When using lib-foundation in another project, the AI receives incorrect repo context. Override `_copilot_scope_prompt` in your consumer shell to customize the scope statement.
+
+**Wire AI lint in a pre-commit hook:**
+
+```bash
+# In your pre-commit hook, before calling _agent_lint:
+export AGENT_LINT_AI_FUNC="_copilot_review"
+export ENABLE_AGENT_LINT=1
+```
+
+`_agent_lint` reads `AGENT_LINT_AI_FUNC` and calls it with staged `.sh`, `.js`, and `.md` files. The AI step is skipped when `AGENT_LINT_AI_FUNC` is unset or the named function is not defined. The gate variable defaults to `ENABLE_AGENT_LINT`; set `AGENT_LINT_GATE_VAR` to use a different env var name.
+
 ### Utilities
 
 | Function | Description |
@@ -129,7 +189,7 @@ source "$(dirname "$0")/lib/agent_rigor.sh"
 | Function | Signature | Description |
 |---|---|---|
 | `_agent_checkpoint <label>` | Commit the working tree with a checkpoint message before a risky change (no-op if clean). |
-| `_agent_audit` | Audits staged diffs for: BATS assertion/test removal, if-count threshold violations (default: 8, configurable via `AGENT_AUDIT_MAX_IF`), bare `sudo` calls, and `kubectl exec` commands with inline credentials. Returns non-zero if any check fails. |
+| `_agent_audit` | Audits staged diffs for: BATS assertion/test removal, if-count threshold violations (default: 8, configurable via `AGENT_AUDIT_MAX_IF`), bare `sudo` calls, `kubectl exec` commands with inline credentials, and hardcoded IPv4 literals in staged `.yaml`/`.yml` files. Set `AGENT_IP_ALLOWLIST` to a regular file path listing repo-relative paths to exempt from the IP check (one path per line; lines beginning with `#` are ignored). Returns non-zero if any check fails. |
 | `_agent_lint` | AI-based lint pass on staged `.sh` files. Gated by `AGENT_LINT_GATE_VAR` (default: `ENABLE_AGENT_LINT=1`). Invokes the function named by `AGENT_LINT_AI_FUNC` with staged file names and rules from `scripts/etc/agent/lint-rules.md`. No-op when gate is off or no `.sh` files are staged. |
 
 ## Global Variables
@@ -138,3 +198,34 @@ source "$(dirname "$0")/lib/agent_rigor.sh"
 |---|---|
 | `_RCRS_RUNNER` | Populated by `_run_command_resolve_sudo` with the final runner array. |
 | `_DCRS_PROVIDER` | Helper scratch variable set by `_deploy_cluster_resolve_provider` for downstream use.
+
+## Installation Helpers
+
+### `_ensure_antigravity_ide`
+
+Installs the Antigravity IDE if not already present.
+
+| Platform | Method |
+|---|---|
+| macOS | `brew install --cask antigravity` |
+| Debian/Ubuntu | `apt-get install -y antigravity` |
+| RedHat/Fedora | `dnf install -y antigravity` |
+
+Returns 0 if installed; calls `_err` if all methods fail.
+
+### `_ensure_antigravity_mcp_playwright`
+
+Ensures Antigravity is configured to launch the Playwright MCP server. Requires `jq`.
+- Determines `mcp_config.json` path via `_antigravity_mcp_config_path()`
+- Creates the file if missing
+- Adds the `playwright` entry `{ "command": "npx", "args": ["-y", "@playwright/mcp@<version>"] }` if not already present; version comes from the `PLAYWRIGHT_MCP_VERSION` env var (defaults to a pinned release — does **not** use `latest`)
+
+### `_antigravity_browser_ready`
+
+Waits for Antigravity (launched with `--remote-debugging-port=9222`) to expose the WebSocket endpoint.
+
+```
+_antigravity_browser_ready [timeout_seconds]
+```
+
+Returns 0 when port 9222 responds to `curl -sf http://localhost:9222/json`; otherwise calls `_err` after the timeout.

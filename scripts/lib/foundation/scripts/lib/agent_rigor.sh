@@ -86,7 +86,7 @@ _agent_audit() {
    if [[ -n "$changed_sh" ]]; then
       local max_if="${AGENT_AUDIT_MAX_IF:-8}"
       local file
-      for file in $changed_sh; do
+      while IFS= read -r -d '' file; do
          [[ -f "$file" ]] || continue
          local current_func="" if_count=0 line
          local offenders_lines=""
@@ -120,12 +120,12 @@ _agent_audit() {
             _warn "Agent audit: $file exceeds if-count threshold in: $offenders_lines"
             status=1
          fi
-      done
+      done < <(git diff --cached --name-only -z -- '*.sh' 2>/dev/null || true)
    fi
 
    if [[ -n "$changed_sh" ]]; then
       local file
-      for file in $changed_sh; do
+      while IFS= read -r -d '' file; do
          [[ -f "$file" ]] || continue
          local bare_sudo
          bare_sudo=$(
@@ -140,12 +140,12 @@ _agent_audit() {
             _warn "$bare_sudo"
             status=1
          fi
-      done
+      done < <(git diff --cached --name-only -z -- '*.sh' 2>/dev/null || true)
    fi
 
    if [[ -n "$changed_sh" ]]; then
       local file
-      for file in $changed_sh; do
+      while IFS= read -r -d '' file; do
          [[ -f "$file" ]] || continue
          local tab_lines
          tab_lines=$(git show :"$file" 2>/dev/null | grep -n $'^ *\t' || true)
@@ -154,7 +154,7 @@ _agent_audit() {
             _warn "$tab_lines"
             status=1
          fi
-      done
+      done < <(git diff --cached --name-only -z -- '*.sh' 2>/dev/null || true)
    fi
 
    local staged_diff
@@ -172,8 +172,15 @@ _agent_audit() {
       fi
    fi
 
+   local allowlist_content=""
+   if [[ -n "${AGENT_IP_ALLOWLIST:-}" && -f "${AGENT_IP_ALLOWLIST}" && -r "${AGENT_IP_ALLOWLIST}" ]]; then
+      allowlist_content="$(grep -vE '^[[:space:]]*(#|$)' "${AGENT_IP_ALLOWLIST}" || true)"
+   fi
    local file
    while IFS= read -r -d '' file; do
+      if [[ -n "$allowlist_content" ]] && grep -Fqx -- "$file" <<< "$allowlist_content"; then
+         continue
+      fi
       local ip_lines
       ip_lines=$(git show :"$file" 2>/dev/null \
          | grep -En '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' || true)
@@ -210,7 +217,7 @@ _agent_lint() {
    fi
 
    local staged_files
-   staged_files="$(git diff --cached --name-only --diff-filter=ACM -- '*.sh' 2>/dev/null || true)"
+   staged_files="$(git diff --cached --name-only --diff-filter=ACM -- '*.sh' '*.js' '*.md' 2>/dev/null || true)"
    if [[ -z "$staged_files" ]]; then
       return 0
    fi
@@ -222,7 +229,7 @@ _agent_lint() {
    fi
 
    local prompt
-   prompt="Review the following staged shell files for architectural violations.\n\nRules:\n$(cat "$rules_file")\n\nFiles:\n$staged_files"
+   prompt="Review the following staged files for architectural violations.\n\nRules:\n$(cat "$rules_file")\n\nFiles:\n$staged_files"
 
    "$ai_func" -p "$prompt"
 }

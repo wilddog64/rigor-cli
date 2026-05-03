@@ -15,10 +15,20 @@ _rigor_usage() {
   echo "Usage: rigor <command> [args]"
   echo ""
   echo "Commands:"
-  echo "  checkpoint          Stage all changes and create a git checkpoint commit"
-  echo "  audit               Run agent audit checks on staged .sh and .yaml/.yml files"
-  echo "  lint [file…]        Run shellcheck on specified files (default: all .sh)"
+  echo "  checkpoint                          Stage all changes and create a git checkpoint commit"
+  echo "  audit                               Run agent audit checks on staged .sh and .yaml/.yml files"
+  echo "  lint [file…]                        Run shellcheck on specified files (default: all .sh)"
+  echo "  review [--prompt <text>] [args…]    Run AI review via configured backend (default: Copilot)"
   exit 1
+}
+
+_rigor_review() {
+  local repo_root
+  repo_root="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+  if [[ -n "$repo_root" && ! -f "$repo_root/.github/copilot-instructions.md" ]]; then
+    _warn "[rigor review] .github/copilot-instructions.md not found — Copilot will use default instructions"
+  fi
+  _ai_agent_review "$@"
 }
 
 _rigor_shellcheck() {
@@ -39,5 +49,6 @@ case "${1:-}" in
   checkpoint) shift; _agent_checkpoint "$@" ;;
   audit)      shift; _agent_audit "$@" ;;
   lint)       shift; _rigor_shellcheck "$@" ;;
+  review)     shift; _rigor_review "$@" ;;
   *)          _rigor_usage ;;
 esac

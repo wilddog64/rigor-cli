@@ -1,22 +1,27 @@
 # Active Context — rigor-cli
 
-## Current State: `feat/v0.1.2` (as of 2026-03-25)
+## Current State: `feat/v0.1.3` (as of 2026-05-03)
 
 **v0.1.0 SHIPPED** — PR #1 merged to main (`f720184`), tagged v0.1.0, GitHub release created 2026-03-24. `enforce_admins` restored.
 **PR #2 MERGED** — `e302af4f` 2026-03-24 — README Scope section + v0.1.0 retro + Copilot PR#2 fixes. `enforce_admins` restored.
 **PR #3 MERGED** — `f304c14` 2026-03-24 — mapfile compat + gist-01; Copilot 4 findings fixed; enforce_admins restored.
 **PR #4 MERGED** — `c5bda1e` 2026-03-25 — v0.1.1 milestone close-out; symlink debt resolved; how-to doc; Copilot 2 findings fixed. `enforce_admins` restored.
 **v0.1.1 SHIPPED** — tagged `c5bda1e`, GitHub release created 2026-03-25.
-**feat/v0.1.2 ACTIVE** — branch cut from `c5bda1e`.
+**PR #5 MERGED** — `5ed7f8d` 2026-03-25 — v0.1.2 lib-foundation v0.3.11 subtree pull; YAML IP audit; Copilot 2 findings fixed. `enforce_admins` restored.
+**v0.1.2 SHIPPED** — tagged `5ed7f8d`, GitHub release created 2026-03-25.
+**feat/v0.1.3 DONE** — branch cut from `5ed7f8d`. `rigor review` subcommand implemented. Spec: `docs/plans/v0.1.3-rigor-review.md`. Subtree pull `afc72a5`; feature commit `66c507d`.
+
+**Docs refreshed:** README updated to include `rigor review`, the `_ai_agent_review` backend contract, and the v0.1.3 release entry.
 
 ---
 
 ## Purpose
 
-Standalone CLI exposing lib-foundation's agent rigor framework as three subcommands:
+Standalone CLI exposing lib-foundation's agent rigor framework as four subcommands:
 - `bin/rigor checkpoint` — `_agent_checkpoint`: stage all + commit
 - `bin/rigor audit` — `_agent_audit`: staged .sh file checks (if-count, bare sudo, credentials, tab indent)
 - `bin/rigor lint` — `_agent_lint` / shellcheck: all .sh files in repo
+- `bin/rigor review` — `_ai_agent_review`: AI-assisted review via configured backend (default: Copilot)
 
 lib-foundation consumed via git subtree at `scripts/lib/foundation/`.
 
@@ -28,7 +33,8 @@ lib-foundation consumed via git subtree at `scripts/lib/foundation/`.
 |---|---|---|
 | v0.1.0 | **SHIPPED** | PR #1 merged (`f720184`) — initial dispatcher + subtree + BATS 3 tests; 2026-03-24; tagged v0.1.0 |
 | v0.1.1 | **SHIPPED** | PR #4 merged (`c5bda1e`) — bash 3.2 compat, gist-01 install, subtree path fix; 2026-03-25; tagged v0.1.1 |
-| v0.1.2 | **ACTIVE** | branch `feat/v0.1.2` cut from `c5bda1e` |
+| v0.1.2 | **SHIPPED** | PR #5 merged (`5ed7f8d`) — lib-foundation v0.3.11 subtree pull, YAML IP audit; 2026-03-25; tagged v0.1.2 |
+| v0.1.3 | **ACTIVE** | branch `feat/v0.1.3` cut from `5ed7f8d` |
 
 ---
 

@@ -1,5 +1,12 @@
 # Progress — lib-foundation
 
+## v0.3.18 Track (branch: `feat/v0.3.18`)
+
+- [x] **Bugfix: `_copilot_auth_check` K3DM_ENABLE_AI gate** — DONE (`f0e29d9`). Spec: `docs/plans/v0.3.18-bugfix-copilot-auth-preflight.md`. Assigned to Codex.
+- [x] **`_copilot_review` combined fix: `--allow-all-tools` + malformed `--deny-tool` patterns** — DONE (`713c18e`). Branch: `fix/copilot-deny-tool-patterns`. Combined spec: `docs/bugs/2026-05-02-copilot-review-noninteractive-combined-fix.md`. Supersedes deny-tool-only spec. Fixes both missing `--allow-all-tools` (non-interactive mode) and 4 patterns missing `)`. Commit: `fix(system): add --allow-all-tools and close malformed --deny-tool patterns in _copilot_review`
+
+---
+
 ## Overall Status
 
 **v0.3.3 SHIPPED** — PR #8 squash-merged (b9f1fda), tagged, GitHub release created 2026-03-16.
@@ -9,15 +16,33 @@
 **v0.3.7 SHIPPED** — PR #13 merged to main (`071c270`) 2026-03-24. Tagged v0.3.7 retroactively, GitHub release created.
 **v0.3.8 SHIPPED** — PR #14 merged to main (`a669a63`) 2026-03-24. Tagged v0.3.8 retroactively, GitHub release created.
 **v0.3.9 SHIPPED** — PR #15 merged to main (`fb09921`) 2026-03-24. No tag (docs-only, no version bump).
-**v0.3.10 ACTIVE** — branch `feat/v0.3.10` cut from main `fb09921`.
+**v0.3.10 SHIPPED** — PR #16 merged to main (`c5662c9`) 2026-03-24. No tag (docs-only, `.clinerules` fix).
+**v0.3.11 SHIPPED** — PR #17 merged to main (`2625683`) 2026-03-25. Tagged v0.3.11, GitHub release created. `enforce_admins` restored.
+**v0.3.12 SHIPPED** — PR #18 squash-merged to main (`91340d62`) 2026-03-25. Tagged v0.3.12, GitHub release created. `enforce_admins` restored.
+**v0.3.13 SHIPPED** — PR #19 squash-merged to main (`e870c6d9`) 2026-03-25. Tagged v0.3.13, GitHub release created. `enforce_admins` restored.
+**v0.3.14 SHIPPED** — PR #20 squash-merged to main (`bbbaf053`) 2026-03-27. Tagged v0.3.14, GitHub release created. `enforce_admins` restored.
+**v0.3.15 SHIPPED** — PR #21 merged to main. Tagged v0.3.15.
+**v0.3.16 SHIPPED** — PR #22 merged to main. Tagged v0.3.16.
+**v0.3.17 SHIPPED** — PR #24 merged to main (`108924b9`). Tagged v0.3.17, GitHub release created 2026-05-01.
+**v0.3.18 IN PROGRESS** — branch `feat/v0.3.18`. PR #25 open.
 
-## v0.3.10 — In Progress
+## v0.3.14 — Shipped
 
-- [x] `.clinerules` `_detect_platform` contract fix — commit `efb22e9` per `docs/plans/v0.3.10-clinerules-detect-platform.md`
+**Dependency:** k3d-manager PR #51 (Copilot) deferred 5 findings here. Fix these before k3d-manager can subtree-pull v0.3.14.
 
-## v0.3.11 — In Progress
+- [x] **`_ensure_antigravity_ide` binary detection** — commit `e52b819` adds `agy`-first detection so macOS installs succeed post-brew
+- [x] **`_antigravity_browser_ready` curl fast-fail** — commit `e52b819` hard-fails when `curl` missing before the polling loop
+- [x] **`agent_rigor.sh` tab-scan NUL-delimited loop** — commit `e52b819` rewrites the tab scan to iterate staged `.sh` files via `-z` for filenames with spaces
+- [x] **`docs/api/functions.md` @latest inaccuracy** — commit `e52b819` documents the `PLAYWRIGHT_MCP_VERSION` env var + pinned version, not `@latest`
+- [x] **`CHANGE.md` version labels** — commit `e52b819` marks the shipped v0.3.12/v0.3.13 entries with release dates
 
-- [x] `_agent_audit` YAML hardcoded-IP check — commit `11e653b` per `docs/plans/v0.3.11-agent-audit-yaml-ip-check.md`
+## v0.3.13 — Shipped
+
+- [x] **`_antigravity_browser_ready` curl probe fix** — PR #19 merged (`e870c6d9`); `_run_command --soft -- curl --max-time "${CURL_MAX_TIME:-30}"` replaces `_curl` probe; BATS stubs updated to target `_run_command`; Copilot `--max-time` finding addressed
+
+## v0.3.12 — Shipped
+
+- [x] **`_ensure_antigravity_ide` + MCP helpers** — Antigravity IDE install + Playwright MCP config helpers; Copilot PR #18 findings addressed in `9f28d88` (apt-get update, mktemp template, PLAYWRIGHT_MCP_VERSION, _curl wrapper, 7 BATS)
 
 ---
 
