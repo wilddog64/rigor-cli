@@ -2,7 +2,7 @@
 
 Standalone CLI for the [lib-foundation](https://github.com/wilddog64/lib-foundation) agent rigor framework. Enforces Bash code quality in any repo — runs as a pre-commit hook, in CI, or on demand.
 
-Three subcommands cover the full spec-driven workflow: `audit` catches style and security violations at commit time, `lint` runs shellcheck across all shell files in CI, and `checkpoint` creates a safe mid-task save point during development. No Kubernetes dependency — works with any Bash project.
+Four subcommands cover the full spec-driven workflow: `audit` catches style and security violations at commit time, `lint` runs shellcheck across all shell files in CI, `checkpoint` creates a safe mid-task save point during development, and `review` runs AI review via the configured backend. No Kubernetes dependency — works with any Bash project.
 
 ## Scope
 
@@ -60,6 +60,7 @@ bin/rigor audit               # check staged .sh and .yaml/.yml files — use as
 bin/rigor lint                # shellcheck all .sh files in the repo
 bin/rigor lint path/to/foo.sh # shellcheck specific file(s)
 bin/rigor checkpoint          # stage all + commit checkpoint (safe mid-task save)
+bin/rigor review --prompt "review this change for shell injection"
 ```
 
 ---
@@ -85,6 +86,10 @@ Runs `shellcheck` on specified files or all `.sh` files in the repo. Catches:
 - Missing `set -euo pipefail`
 - Command injection risks and other shellcheck-detected issues
 
+### `rigor review` — AI review
+
+Runs AI-assisted review through `_ai_agent_review` from lib-foundation. By default it uses Copilot with `AI_REVIEW_MODEL=gpt-5.4-mini`, and it warns when the calling repo does not have `.github/copilot-instructions.md`.
+
 ### `rigor checkpoint`
 
 Stages all changes (`git add -A`) and creates a checkpoint commit. Use during multi-step development tasks to preserve a known-good state before continuing.
@@ -95,7 +100,7 @@ Stages all changes (`git add -A`) and creates a checkpoint commit. Use during mu
 
 ```
 bin/
-  rigor                    # dispatcher (checkpoint | audit | lint)
+  rigor                    # dispatcher (checkpoint | audit | lint | review)
 scripts/
   lib/foundation/          # lib-foundation git subtree (DO NOT EDIT)
   tests/
@@ -131,6 +136,15 @@ rigor lint scripts/lib/system.sh    # shellcheck specific file
 ```
 
 Defaults to `git ls-files '*.sh'` when no files are specified.
+
+#### `rigor review [--prompt <text>] [args…]`
+
+```bash
+rigor review --prompt "review this diff for security issues"
+rigor review --prompt "check this function for shell injection"
+```
+
+Backed by `_ai_agent_review` from lib-foundation. Uses the backend selected by `AI_REVIEW_FUNC` (default: `copilot`) with `AI_REVIEW_MODEL` (default: `gpt-5.4-mini`).
 
 #### `rigor checkpoint`
 
@@ -198,6 +212,7 @@ shellcheck bin/rigor
 
 | Version | Date | Highlights |
 |---|---|---|
+| [v0.1.3](https://github.com/wilddog64/rigor-cli/tree/feat/v0.1.3) | 2026-05-03 | `review` subcommand via `_ai_agent_review`; lib-foundation v0.3.19 subtree pull |
 | [v0.1.2](https://github.com/wilddog64/rigor-cli/releases/tag/v0.1.2) | 2026-03-25 | lib-foundation v0.3.11 subtree pull — `audit` now checks staged `.yaml`/`.yml` for hardcoded IPs |
 | [v0.1.1](https://github.com/wilddog64/rigor-cli/releases/tag/v0.1.1) | 2026-03-25 | bash 3.2 compat; gist-01 one-command install; subtree path fix; lib-foundation `.clinerules` corrected |
 | [v0.1.0](https://github.com/wilddog64/rigor-cli/releases/tag/v0.1.0) | 2026-03-24 | Initial release — `checkpoint \| audit \| lint` dispatcher; lib-foundation v0.3.8 subtree; BATS 3 tests |

@@ -35,6 +35,7 @@
 - [x] v0.1.1 tagged + GitHub release created — 2026-03-25
 - [x] Retro: `docs/retro/2026-03-25-v0.1.1-retrospective.md`
 - [x] v0.1.3 rigor review — subtree pull `afc72a5`; feature commit `66c507d`; `rigor review` dispatches to `_ai_agent_review`
+- [x] README refresh — docs updated to include `rigor review`, the AI review backend contract, and the v0.1.3 release entry
 
 ---
 

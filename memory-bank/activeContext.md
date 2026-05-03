@@ -11,6 +11,8 @@
 **v0.1.2 SHIPPED** — tagged `5ed7f8d`, GitHub release created 2026-03-25.
 **feat/v0.1.3 DONE** — branch cut from `5ed7f8d`. `rigor review` subcommand implemented. Spec: `docs/plans/v0.1.3-rigor-review.md`. Subtree pull `afc72a5`; feature commit `66c507d`.
 
+**Docs refreshed:** README updated to include `rigor review`, the `_ai_agent_review` backend contract, and the v0.1.3 release entry.
+
 ---
 
 ## Purpose
