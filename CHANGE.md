@@ -2,9 +2,13 @@
 
 ## [Unreleased]
 
+---
+
+## [v0.1.3] — 2026-05-03
+
 ### Added
 - `bin/rigor`: `review` subcommand — `_rigor_review` wraps `_ai_agent_review`; warns when `.github/copilot-instructions.md` is absent; dispatches to backend selected by `AI_REVIEW_FUNC` (default: `copilot`) with model from `AI_REVIEW_MODEL` (default: `gpt-5.4-mini`)
-- `scripts/lib/foundation/`: subtree pulled to lib-foundation v0.3.19 — `_ai_agent_review` dispatch wrapper, `_copilot_review` deny-tool fix, `_copilot_auth_check` gate removal
+- `scripts/lib/foundation/`: subtree pulled to lib-foundation v0.3.20 — `_ai_agent_review` dispatch wrapper, `_copilot_review` deny-tool fix, `_copilot_auth_check` gate removal, `_agent_lint` BATS coverage for `.js`/`.md` globs, stale `K3DM_ENABLE_AI` doc references removed
 
 ---
 
