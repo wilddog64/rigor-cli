@@ -1,6 +1,6 @@
 # Active Context — rigor-cli
 
-## Current State: `feat/v0.1.2` (as of 2026-03-25)
+## Current State: `feat/v0.1.3` (as of 2026-05-03)
 
 **v0.1.0 SHIPPED** — PR #1 merged to main (`f720184`), tagged v0.1.0, GitHub release created 2026-03-24. `enforce_admins` restored.
 **PR #2 MERGED** — `e302af4f` 2026-03-24 — README Scope section + v0.1.0 retro + Copilot PR#2 fixes. `enforce_admins` restored.
