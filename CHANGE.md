@@ -1,5 +1,13 @@
 # Changes — rigor-cli
 
+## [Unreleased]
+
+### Added
+- `bin/rigor`: `review` subcommand — `_rigor_review` wraps `_ai_agent_review`; warns when `.github/copilot-instructions.md` is absent; dispatches to backend selected by `AI_REVIEW_FUNC` (default: `copilot`) with model from `AI_REVIEW_MODEL` (default: `gpt-5.4-mini`)
+- `scripts/lib/foundation/`: subtree pulled to lib-foundation v0.3.19 — `_ai_agent_review` dispatch wrapper, `_copilot_review` deny-tool fix, `_copilot_auth_check` gate removal
+
+---
+
 ## [v0.1.2] — 2026-03-25
 
 ### Changed

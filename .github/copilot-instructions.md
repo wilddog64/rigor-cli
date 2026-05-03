@@ -8,7 +8,7 @@ Use the rules below to shape all code suggestions and PR reviews.
 
 ## Architecture
 
-- **Dispatcher**: `bin/rigor` — thin bash script, sources lib-foundation, dispatches to `_agent_*` functions
+- **Dispatcher**: `bin/rigor` — thin bash script, sources lib-foundation, dispatches to `_agent_*` and `_ai_agent_review` functions; subcommands: `checkpoint`, `audit`, `lint`, `review`
 - **Subtree**: `scripts/lib/foundation/` — lib-foundation copy; **DO NOT EDIT** — all changes go upstream first
 - **Tests**: `scripts/tests/rigor.bats` — always run with `env -i` clean environment
 - **CI**: `.github/workflows/ci.yml` — shellcheck + BATS on every push and PR
@@ -36,7 +36,7 @@ Flag any of the following as blocking issues:
 - **`declare -A`** (associative arrays) — not available in bash 3.2
 - **`mapfile`** / **`readarray`** — not available in bash 3.2
 
-Note: `mapfile` is currently used in `bin/rigor`'s `_rigor_shellcheck` for the default-files case. This is a known limitation — acceptable for v0.1.0 since CI runs on Ubuntu; flag if macOS compatibility becomes a requirement.
+Note: `mapfile` is currently used in `bin/rigor`'s `_rigor_shellcheck` for the default-files case. This is a known limitation — acceptable since CI runs on Ubuntu; flag if macOS compatibility becomes a requirement.
 
 ### Privilege Escalation
 
