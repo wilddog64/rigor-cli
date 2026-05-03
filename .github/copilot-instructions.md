@@ -1,6 +1,6 @@
 # GitHub Copilot Instructions — rigor-cli
 
-rigor-cli is a standalone CLI dispatcher over [lib-foundation](https://github.com/wilddog64/lib-foundation)'s agent rigor framework. It exposes three subcommands (`checkpoint`, `audit`, `lint`) backed by `_agent_checkpoint`, `_agent_audit`, and `_agent_lint` from the lib-foundation git subtree at `scripts/lib/foundation/`.
+rigor-cli is a standalone CLI dispatcher over [lib-foundation](https://github.com/wilddog64/lib-foundation)'s agent rigor framework. It exposes four subcommands (`checkpoint`, `audit`, `lint`, `review`) — `checkpoint`, `audit`, and `review` are backed by `_agent_checkpoint`, `_agent_audit`, and `_ai_agent_review` from the lib-foundation git subtree at `scripts/lib/foundation/`; `lint` dispatches per-extension via `_rigor_lint` in `bin/rigor` itself.
 
 Use the rules below to shape all code suggestions and PR reviews.
 
@@ -8,7 +8,7 @@ Use the rules below to shape all code suggestions and PR reviews.
 
 ## Architecture
 
-- **Dispatcher**: `bin/rigor` — thin bash script, sources lib-foundation, dispatches to `_agent_*` and `_ai_agent_review` functions; subcommands: `checkpoint`, `audit`, `lint`, `review`
+- **Dispatcher**: `bin/rigor` — thin bash script, sources lib-foundation, dispatches to `_agent_*` and `_ai_agent_review` functions; subcommands: `checkpoint`, `audit`, `lint`, `review`; `lint` uses `RIGOR_LINT_BACKENDS` (default `sh:shellcheck`) to dispatch per-extension
 - **Subtree**: `scripts/lib/foundation/` — lib-foundation copy; **DO NOT EDIT** — all changes go upstream first
 - **Tests**: `scripts/tests/rigor.bats` — always run with `env -i` clean environment
 - **CI**: `.github/workflows/ci.yml` — shellcheck + BATS on every push and PR
@@ -36,7 +36,7 @@ Flag any of the following as blocking issues:
 - **`declare -A`** (associative arrays) — not available in bash 3.2
 - **`mapfile`** / **`readarray`** — not available in bash 3.2
 
-Note: `mapfile` is currently used in `bin/rigor`'s `_rigor_shellcheck` for the default-files case. This is a known limitation — acceptable since CI runs on Ubuntu; flag if macOS compatibility becomes a requirement.
+Note: `bin/rigor` now dispatches `lint` through `_rigor_lint`, which uses tracked-file iteration rather than `mapfile`. If macOS compatibility becomes a requirement, still flag any newly introduced bash 4+ features.
 
 ### Privilege Escalation
 

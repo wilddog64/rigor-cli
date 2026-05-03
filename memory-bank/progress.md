@@ -5,7 +5,8 @@
 **v0.1.0 SHIPPED** — PR #1 merged (`f720184`), tagged v0.1.0, GitHub release created 2026-03-24.
 **v0.1.1 SHIPPED** — PR #4 merged (`c5bda1e`), tagged v0.1.1, GitHub release created 2026-03-25. `enforce_admins` restored.
 **v0.1.2 SHIPPED** — PR #5 merged (`5ed7f8d`), tagged v0.1.2, GitHub release created 2026-03-25. `enforce_admins` restored.
-**v0.1.3 ACTIVE** — branch `feat/v0.1.3`. Spec implemented: `docs/plans/v0.1.3-rigor-review.md`. Subtree pull `afc72a5`; feature commit `66c507d` pushed.
+**v0.1.3 SHIPPED** — PR #6 merged (`675f6e9`), tagged `306cd86`, GitHub release created 2026-05-03. `enforce_admins` restored.
+**v0.1.4 ACTIVE** — branch `feat/v0.1.4` cut from `306cd86`. Spec implemented: `docs/plans/v0.1.4-multi-language-lint.md`. Commit `a4d9771` pushed.
 
 ---
 
@@ -36,14 +37,17 @@
 - [x] Retro: `docs/retro/2026-03-25-v0.1.1-retrospective.md`
 - [x] v0.1.3 rigor review — subtree pull `afc72a5`; feature commit `66c507d`; `rigor review` dispatches to `_ai_agent_review`
 - [x] README refresh — docs updated to include `rigor review`, the AI review backend contract, and the v0.1.3 release entry
+- [x] PR #6 merged (`675f6e9`) — rigor review subcommand; lib-foundation v0.3.20 subtree; Copilot 4 findings fixed
+- [x] v0.1.3 tagged `306cd86`, GitHub release created 2026-05-03
+- [x] Retro: `docs/retro/2026-05-03-v0.1.3-retrospective.md`
 
 ---
 
 ## What Is Pending
 
-### v0.1.3 — ACTIVE
+### v0.1.4 — ACTIVE
 
-_(all items complete — pending PR + merge)_
+- [x] Multi-language lint — `RIGOR_LINT_BACKENDS` dispatch; spec `docs/plans/v0.1.4-multi-language-lint.md`; commit `a4d9771`
 
 ---
 

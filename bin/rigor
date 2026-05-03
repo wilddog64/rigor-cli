@@ -17,7 +17,7 @@ _rigor_usage() {
   echo "Commands:"
   echo "  checkpoint                          Stage all changes and create a git checkpoint commit"
   echo "  audit                               Run agent audit checks on staged .sh and .yaml/.yml files"
-  echo "  lint [file…]                        Run shellcheck on specified files (default: all .sh)"
+  echo "  lint [file…]                        Run configured linters (RIGOR_LINT_BACKENDS, default: sh:shellcheck)"
   echo "  review [--prompt <text>] [args…]    Run AI review via configured backend (default: Copilot)"
   exit 1
 }
@@ -31,24 +31,55 @@ _rigor_review() {
   _ai_agent_review "$@"
 }
 
-_rigor_shellcheck() {
-  local files=("$@")
-  if [[ ${#files[@]} -eq 0 ]]; then
-    while IFS= read -r f; do
-      files+=("$f")
-    done < <(git ls-files '*.sh' 2>/dev/null || true)
+_rigor_lint() {
+  local explicit_files=("$@")
+  local backends="${RIGOR_LINT_BACKENDS:-sh:shellcheck}"
+  local exit_code=0
+  local ran=0
+  local pair ext cmd
+
+  while IFS= read -r pair; do
+    [[ -z "$pair" ]] && continue
+    [[ "$pair" != *:* ]] && continue
+
+    ext="${pair%%:*}"
+    cmd="${pair##*:}"
+    [[ -z "$ext" || -z "$cmd" ]] && continue
+
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+      _warn "rigor lint: backend '$cmd' for .$ext not found — skipping"
+      continue
+    fi
+
+    local matched=()
+    if [[ ${#explicit_files[@]} -gt 0 ]]; then
+      local f
+      for f in "${explicit_files[@]}"; do
+        [[ "$f" == *."$ext" ]] && matched+=("$f")
+      done
+    else
+      while IFS= read -r f; do
+        matched+=("$f")
+      done < <(git ls-files "*.$ext" 2>/dev/null || true)
+    fi
+
+    if [[ ${#matched[@]} -gt 0 ]]; then
+      ran=1
+      "$cmd" "${matched[@]}" || exit_code=$?
+    fi
+  done < <(printf '%s\n' "$backends" | tr ' ' '\n')
+
+  if [[ $ran -eq 0 && ${#explicit_files[@]} -eq 0 ]]; then
+    _warn "rigor lint: no files found for configured backends"
   fi
-  if [[ ${#files[@]} -eq 0 ]]; then
-    echo "rigor lint: no shell files provided" >&2
-    return 0
-  fi
-  shellcheck "${files[@]}"
+
+  return "$exit_code"
 }
 
 case "${1:-}" in
   checkpoint) shift; _agent_checkpoint "$@" ;;
   audit)      shift; _agent_audit "$@" ;;
-  lint)       shift; _rigor_shellcheck "$@" ;;
+  lint)       shift; _rigor_lint "$@" ;;
   review)     shift; _rigor_review "$@" ;;
   *)          _rigor_usage ;;
 esac

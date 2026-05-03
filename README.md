@@ -1,14 +1,18 @@
 # rigor-cli
 
-Standalone CLI for the [lib-foundation](https://github.com/wilddog64/lib-foundation) agent rigor framework. Enforces Bash code quality in any repo — runs as a pre-commit hook, in CI, or on demand.
+Standalone CLI for the [lib-foundation](https://github.com/wilddog64/lib-foundation) agent rigor framework. Enforces code quality across any language — runs as a pre-commit hook, in CI, or on demand.
 
-Four subcommands cover the full spec-driven workflow: `audit` catches style and security violations at commit time, `lint` runs shellcheck across all shell files in CI, `checkpoint` creates a safe mid-task save point during development, and `review` runs AI review via the configured backend. No Kubernetes dependency — works with any Bash project.
+Four subcommands cover the full spec-driven workflow: `audit` catches style and security violations at commit time, `lint` runs configured static analysis per language, `checkpoint` creates a safe mid-task save point during development, and `review` runs AI-assisted review via the configured backend. No Kubernetes dependency — works with any project.
 
 ## Scope
 
-rigor-cli enforces quality on **Bash/shell scripts only**. By default it targets files with a `.sh` extension — staged `.sh` files at commit time and `shellcheck` on `.sh` files in CI. Non-shell code (Python, Go, Ruby, etc.) is out of scope — use language-specific linters for those.
+rigor-cli enforces quality across **any language** via three mechanisms:
 
-If your repo is primarily non-shell, rigor-cli still guards the shell layer: CI scripts, install helpers, and any `.sh` files checked into the repo. Shell scripts without a `.sh` extension (e.g. `bin/rigor` itself) are not picked up automatically — pass them explicitly to `rigor lint` if you want them checked.
+- **`rigor audit`** — pre-commit enforcement for `.sh` (style/security checks) and `.yaml`/`.yml` (hardcoded IP detection). These checks are extension-gated and apply only to the relevant file types.
+- **`rigor lint`** — runs configured static analysis backends per extension. Default: `shellcheck` on `.sh`. Configure additional languages via `RIGOR_LINT_BACKENDS`.
+- **`rigor review`** — AI-assisted review for any staged content, regardless of language.
+
+Shell scripts without a `.sh` extension (e.g. `bin/rigor` itself) are not supported by `rigor lint` — extension matching is required. Use `shellcheck` directly for extensionless scripts.
 
 ---
 
@@ -57,8 +61,8 @@ git subtree pull --prefix=.rigor \
 
 ```bash
 bin/rigor audit               # check staged .sh and .yaml/.yml files — use as pre-commit hook
-bin/rigor lint                # shellcheck all .sh files in the repo
-bin/rigor lint path/to/foo.sh # shellcheck specific file(s)
+bin/rigor lint                # run all configured backends on tracked files
+bin/rigor lint path/to/foo.sh # run matching backend for specific file(s)
 bin/rigor checkpoint          # stage all + commit checkpoint (safe mid-task save)
 bin/rigor review --prompt "review this change for shell injection"
 ```
@@ -79,12 +83,28 @@ Runs on staged `.sh` and `.yaml`/`.yml` files. Fails the commit if any file cont
 | Tab indentation | `.sh` | Tab or mixed space+tab indent — enforce 2-space style |
 | Hardcoded IP | `.yaml`/`.yml` | IPv4 addresses — use CoreDNS hostname (e.g. `svc.cluster.local`) instead |
 
-### `rigor lint` — shellcheck
+### `rigor lint` — multi-language static analysis
 
-Runs `shellcheck` on specified files or all `.sh` files in the repo. Catches:
-- Unquoted variable expansions
-- Missing `set -euo pipefail`
-- Command injection risks and other shellcheck-detected issues
+Runs configured linter backends against tracked files grouped by extension. Controlled by
+`RIGOR_LINT_BACKENDS` (space-separated `ext:command` pairs, default: `sh:shellcheck`).
+
+| Env Var | Default | Description |
+|---|---|---|
+| `RIGOR_LINT_BACKENDS` | `sh:shellcheck` | Space-separated `ext:command` pairs. Each backend is called with all tracked files of that extension. Missing binaries produce a warning and are skipped — they do not fail the run. |
+
+```bash
+# Default: shellcheck all .sh files
+bin/rigor lint
+
+# Python + shell
+RIGOR_LINT_BACKENDS="sh:shellcheck py:ruff" bin/rigor lint
+
+# TypeScript + Python + shell
+RIGOR_LINT_BACKENDS="sh:shellcheck py:ruff ts:eslint" bin/rigor lint
+
+# Specific files (only runs backends whose extension matches)
+bin/rigor lint src/main.py scripts/deploy.sh
+```
 
 ### `rigor review` — AI review
 
@@ -131,11 +151,12 @@ Backed by `_agent_audit` from [lib-foundation](https://github.com/wilddog64/lib-
 #### `rigor lint [file…]`
 
 ```bash
-rigor lint                          # shellcheck all tracked .sh files
-rigor lint scripts/lib/system.sh    # shellcheck specific file
+rigor lint                                    # run all configured backends on tracked files
+rigor lint scripts/lib/system.sh              # run matching backend for .sh
+RIGOR_LINT_BACKENDS="sh:shellcheck py:ruff" bin/rigor lint   # multi-language
 ```
 
-Defaults to `git ls-files '*.sh'` when no files are specified.
+Reads `RIGOR_LINT_BACKENDS` (default: `sh:shellcheck`). For each `ext:cmd` pair, collects tracked files with that extension and passes them to `cmd`. If a backend binary is missing, emits a warning and continues — does not fail. Returns non-zero if any backend fails.
 
 #### `rigor review [--prompt <text>] [args…]`
 
@@ -212,7 +233,7 @@ shellcheck bin/rigor
 
 | Version | Date | Highlights |
 |---|---|---|
-| [v0.1.3](https://github.com/wilddog64/rigor-cli/tree/feat/v0.1.3) | 2026-05-03 | `review` subcommand via `_ai_agent_review`; lib-foundation v0.3.19 subtree pull |
+| [v0.1.3](https://github.com/wilddog64/rigor-cli/releases/tag/v0.1.3) | 2026-05-03 | `review` subcommand via `_ai_agent_review`; lib-foundation v0.3.20 subtree pull |
 | [v0.1.2](https://github.com/wilddog64/rigor-cli/releases/tag/v0.1.2) | 2026-03-25 | lib-foundation v0.3.11 subtree pull — `audit` now checks staged `.yaml`/`.yml` for hardcoded IPs |
 | [v0.1.1](https://github.com/wilddog64/rigor-cli/releases/tag/v0.1.1) | 2026-03-25 | bash 3.2 compat; gist-01 one-command install; subtree path fix; lib-foundation `.clinerules` corrected |
 
