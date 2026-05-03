@@ -1,6 +1,12 @@
 # Changes — rigor-cli
 
-## [Unreleased]
+## [v0.1.4] — 2026-05-03
+
+### Added
+- `bin/rigor`: `_rigor_lint` replaces `_rigor_shellcheck` — dispatches per-extension via `RIGOR_LINT_BACKENDS` (space-separated `ext:command` pairs, default: `sh:shellcheck`); missing backends warn and skip; returns non-zero if any backend fails
+- `scripts/tests/rigor.bats`: 3 new tests — RIGOR_LINT_BACKENDS dispatch, missing backend warning, explicit file extension filtering (6 total)
+- README: updated Scope section, lint docs, and `RIGOR_LINT_BACKENDS` env var table
+- `.github/copilot-instructions.md`: updated lint description to reference `RIGOR_LINT_BACKENDS`
 
 ---
 
