@@ -1,6 +1,6 @@
 # Active Context — rigor-cli
 
-## Current State: `feat/v0.1.4` (as of 2026-05-03)
+## Current State: `rigor-cli-v0.1.5` (as of 2026-05-03)
 
 **v0.1.0 SHIPPED** — PR #1 merged to main (`f720184`), tagged v0.1.0, GitHub release created 2026-03-24. `enforce_admins` restored.
 **PR #2 MERGED** — `e302af4f` 2026-03-24 — README Scope section + v0.1.0 retro + Copilot PR#2 fixes. `enforce_admins` restored.
@@ -11,11 +11,11 @@
 **v0.1.2 SHIPPED** — tagged `5ed7f8d`, GitHub release created 2026-03-25.
 **PR #6 MERGED** — `675f6e9` 2026-05-03 — `rigor review` subcommand; lib-foundation v0.3.20 subtree pull; Copilot 4 findings fixed. `enforce_admins` restored.
 **v0.1.3 SHIPPED** — tagged `306cd86`, GitHub release created 2026-05-03. `enforce_admins` restored.
-**feat/v0.1.4 DONE** — multi-language lint implemented. Spec: `docs/plans/v0.1.4-multi-language-lint.md`. Commit `a4d9771`.
+**v0.1.4 SHIPPED** — PR #7 merged to main (`ac7a39d`), `rigor lint` now dispatches per-extension via `RIGOR_LINT_BACKENDS`. Release docs and memory-bank were updated in the merge commit.
 
-## v0.1.4 Open Items
-
-- [x] **Multi-language lint via `RIGOR_LINT_BACKENDS`** — DONE (`a4d9771`). Spec: `docs/plans/v0.1.4-multi-language-lint.md`. `_rigor_lint` replaces `_rigor_shellcheck`.
+## Current Focus
+- Branch `rigor-cli-v0.1.5` is the next working branch.
+- Follow-up work will be subtree integration in `pyjenkinsapi` and post-merge repository cleanup.
 
 ---
 
@@ -38,7 +38,8 @@ lib-foundation consumed via git subtree at `scripts/lib/foundation/`.
 | v0.1.0 | **SHIPPED** | PR #1 merged (`f720184`) — initial dispatcher + subtree + BATS 3 tests; 2026-03-24; tagged v0.1.0 |
 | v0.1.1 | **SHIPPED** | PR #4 merged (`c5bda1e`) — bash 3.2 compat, gist-01 install, subtree path fix; 2026-03-25; tagged v0.1.1 |
 | v0.1.2 | **SHIPPED** | PR #5 merged (`5ed7f8d`) — lib-foundation v0.3.11 subtree pull, YAML IP audit; 2026-03-25; tagged v0.1.2 |
-| v0.1.3 | **ACTIVE** | branch `feat/v0.1.3` cut from `5ed7f8d` |
+| v0.1.3 | **SHIPPED** | PR #6 merged (`675f6e9`) — `rigor review`; tagged `306cd86` |
+| v0.1.4 | **SHIPPED** | PR #7 merged (`ac7a39d`) — multi-language lint via `RIGOR_LINT_BACKENDS` |
 
 ---
 
