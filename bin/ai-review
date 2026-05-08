@@ -70,7 +70,13 @@ _load_default_prompt() {
   printf 'Review this change for correctness, backward compatibility, and missing tests or docs. Prioritize behavior regressions and security risks over style-only comments.'
 }
 
-_default_rigor_bin="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/rigor"
+_self="${BASH_SOURCE[0]}"
+if [[ -L "$_self" ]]; then
+  _link="$(readlink "$_self")"
+  [[ "$_link" != /* ]] && _link="$(cd "$(dirname "$_self")" && pwd)/$_link"
+  _self="$_link"
+fi
+_default_rigor_bin="$(cd -- "$(dirname -- "$_self")" && pwd)/rigor"
 prompt_file=""
 model="${AI_REVIEW_MODEL:-}"
 stream_mode="${AI_REVIEW_STREAM:-on}"
