@@ -22,7 +22,13 @@ _warn() {
   printf 'WARN: %s\n' "$*" >&2
 }
 
-_rigor_bin="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/rigor"
+_self="${BASH_SOURCE[0]}"
+if [[ -L "$_self" ]]; then
+  _link="$(readlink "$_self")"
+  [[ "$_link" != /* ]] && _link="$(cd "$(dirname "$_self")" && pwd)/$_link"
+  _self="$_link"
+fi
+_rigor_bin="$(cd -- "$(dirname -- "$_self")" && pwd)/rigor"
 _repo_root_path="$(_repo_root || true)"
 [[ -n "$_repo_root_path" ]] || {
   _warn "Not inside a git repository; falling back to current directory"

@@ -44,7 +44,13 @@ _install_ruff() {
   fi
 }
 
-_rigor_bin="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/rigor"
+_self="${BASH_SOURCE[0]}"
+if [[ -L "$_self" ]]; then
+  _link="$(readlink "$_self")"
+  [[ "$_link" != /* ]] && _link="$(cd "$(dirname "$_self")" && pwd)/$_link"
+  _self="$_link"
+fi
+_rigor_bin="$(cd -- "$(dirname -- "$_self")" && pwd)/rigor"
 [[ -x "$_rigor_bin" ]] || _err "rigor not found at ${_rigor_bin} — check rigor-cli installation"
 
 backend_cmd="ruff"
