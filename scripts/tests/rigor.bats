@@ -91,3 +91,102 @@ teardown() {
   [ "$status" -eq 0 ]
   [[ "$output" != *"shellcheck"* ]]
 }
+
+# ── ai-bootstrap tests ────────────────────────────────────────────────────────
+
+_setup_ai_scripts() {
+  local repo_root="${BATS_TEST_DIRNAME}/../.."
+  cp "$repo_root/bin/ai-bootstrap" "$BATS_TEST_TMPDIR/bin/ai-bootstrap"
+  cp "$repo_root/bin/ai-lint"      "$BATS_TEST_TMPDIR/bin/ai-lint"
+  cp "$repo_root/bin/ai-review"    "$BATS_TEST_TMPDIR/bin/ai-review"
+  chmod +x "$BATS_TEST_TMPDIR/bin/ai-bootstrap" \
+            "$BATS_TEST_TMPDIR/bin/ai-lint" \
+            "$BATS_TEST_TMPDIR/bin/ai-review"
+}
+
+@test "ai-bootstrap: errors when rigor binary is missing" {
+  cd "$BATS_TEST_TMPDIR" || exit 1
+  _setup_ai_scripts
+  rm -f "$BATS_TEST_TMPDIR/bin/rigor"
+  run "$BATS_TEST_TMPDIR/bin/ai-bootstrap"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"rigor not found"* ]]
+}
+
+@test "ai-bootstrap: reports ready when backend command exists" {
+  cd "$BATS_TEST_TMPDIR" || exit 1
+  _setup_ai_scripts
+  printf '#!/usr/bin/env bash\nexit 0\n' > "$BATS_TEST_TMPDIR/bin/ruff"
+  chmod +x "$BATS_TEST_TMPDIR/bin/ruff"
+  run "$BATS_TEST_TMPDIR/bin/ai-bootstrap"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Backend ready: ruff"* ]]
+}
+
+@test "ai-bootstrap: errors when backend missing and --install not given" {
+  cd "$BATS_TEST_TMPDIR" || exit 1
+  _setup_ai_scripts
+  run env PATH="$BATS_TEST_TMPDIR/bin:$PATH" "$BATS_TEST_TMPDIR/bin/ai-bootstrap" --backend-cmd definitely-missing-xyz
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"Missing backend command"* ]]
+}
+
+# ── ai-lint tests ─────────────────────────────────────────────────────────────
+
+@test "ai-lint: errors when rigor binary is missing" {
+  cd "$BATS_TEST_TMPDIR" || exit 1
+  _setup_ai_scripts
+  rm -f "$BATS_TEST_TMPDIR/bin/rigor"
+  run "$BATS_TEST_TMPDIR/bin/ai-lint"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"rigor not found"* ]]
+}
+
+@test "ai-lint: delegates to rigor lint with RIGOR_LINT_BACKENDS set" {
+  cd "$BATS_TEST_TMPDIR" || exit 1
+  _setup_ai_scripts
+  printf '#!/usr/bin/env bash\nprintf "rigor-called: %%s\\n" "$*"\n' \
+    > "$BATS_TEST_TMPDIR/bin/rigor" && chmod +x "$BATS_TEST_TMPDIR/bin/rigor"
+  run "$BATS_TEST_TMPDIR/bin/ai-lint"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"rigor-called"* ]]
+  [[ "$output" == *"lint"* ]]
+}
+
+# ── ai-review tests ───────────────────────────────────────────────────────────
+
+@test "ai-review: uses .rigor/review-prompt when present" {
+  cd "$BATS_TEST_TMPDIR" || exit 1
+  _setup_ai_scripts
+  mkdir -p .rigor
+  printf 'my-custom-prompt' > .rigor/review-prompt
+  printf '#!/usr/bin/env bash\nprintf "%%s\\n" "$*"\n' \
+    > "$BATS_TEST_TMPDIR/bin/rigor" && chmod +x "$BATS_TEST_TMPDIR/bin/rigor"
+  run "$BATS_TEST_TMPDIR/bin/ai-review"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"my-custom-prompt"* ]]
+}
+
+@test "ai-review: RIGOR_REVIEW_DEFAULT_PROMPT overrides .rigor/review-prompt" {
+  cd "$BATS_TEST_TMPDIR" || exit 1
+  _setup_ai_scripts
+  mkdir -p .rigor
+  printf 'file-prompt' > .rigor/review-prompt
+  printf '#!/usr/bin/env bash\nprintf "%%s\\n" "$*"\n' \
+    > "$BATS_TEST_TMPDIR/bin/rigor" && chmod +x "$BATS_TEST_TMPDIR/bin/rigor"
+  RIGOR_REVIEW_DEFAULT_PROMPT="env-prompt" run "$BATS_TEST_TMPDIR/bin/ai-review"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"env-prompt"* ]]
+  [[ "$output" != *"file-prompt"* ]]
+}
+
+@test "ai-review: truncates stdin over RIGOR_REVIEW_MAX_LINES" {
+  cd "$BATS_TEST_TMPDIR" || exit 1
+  _setup_ai_scripts
+  printf '#!/usr/bin/env bash\nprintf "%%s\\n" "$*"\n' \
+    > "$BATS_TEST_TMPDIR/bin/rigor" && chmod +x "$BATS_TEST_TMPDIR/bin/rigor"
+  # generate 20 lines, cap at 5
+  run bash -c "seq 1 20 | RIGOR_REVIEW_MAX_LINES=5 $BATS_TEST_TMPDIR/bin/ai-review"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"truncated"* ]]
+}
