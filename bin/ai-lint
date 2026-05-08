@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+_repo_root() {
+  git rev-parse --show-toplevel 2>/dev/null
+}
+
+_usage() {
+  cat <<'EOF'
+Usage: ai-lint [rigor lint args...]
+
+Run rigor lint with the repo-local language backend mapping.
+
+Environment:
+  RIGOR_LINT_BACKEND_CMD   Backend command for Python files (default: ruff)
+  RIGOR_LINT_BACKENDS      Full backends spec passed to rigor lint; overrides
+                           RIGOR_LINT_BACKEND_CMD when set (default: py:<cmd>)
+EOF
+}
+
+_warn() {
+  printf 'WARN: %s\n' "$*" >&2
+}
+
+_rigor_bin="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/rigor"
+_repo_root_path="$(_repo_root || true)"
+[[ -n "$_repo_root_path" ]] || {
+  _warn "Not inside a git repository; falling back to current directory"
+  _repo_root_path="$(pwd)"
+}
+
+cd "$_repo_root_path"
+
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+  _usage
+  exit 0
+fi
+
+[[ -x "$_rigor_bin" ]] || {
+  printf 'ERROR: rigor not found at %s — check rigor-cli installation\n' "$_rigor_bin" >&2
+  exit 1
+}
+
+backend_cmd="${RIGOR_LINT_BACKEND_CMD:-ruff}"
+export RIGOR_LINT_BACKENDS="${RIGOR_LINT_BACKENDS:-py:${backend_cmd}}"
+
+exec "$_rigor_bin" lint "$@"

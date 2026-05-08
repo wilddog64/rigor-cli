@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+_repo_root() {
+  git rev-parse --show-toplevel 2>/dev/null
+}
+
+_usage() {
+  cat <<'EOF'
+Usage: ai-bootstrap [--backend-cmd CMD] [--install]
+
+Prepare the local lint backend for use with rigor-cli.
+
+Options:
+  --backend-cmd CMD   Backend command to verify/install (default: ruff)
+  --install           Install the backend when it is missing
+  -h, --help          Show this help text
+
+Environment:
+  RIGOR_PYTHON_BIN    Python interpreter used to install ruff (default: python3)
+EOF
+}
+
+_warn() {
+  printf 'WARN: %s\n' "$*" >&2
+}
+
+_err() {
+  printf 'ERROR: %s\n' "$*" >&2
+  exit 1
+}
+
+_install_ruff() {
+  local py_bin="${RIGOR_PYTHON_BIN:-python3}"
+  local user_bin_dir
+  command -v "$py_bin" >/dev/null 2>&1 || _err "Missing Python interpreter: ${py_bin}"
+  user_bin_dir="$("$py_bin" -m site --user-base)/bin"
+  "$py_bin" -m pip install --user ruff
+  if [[ -d "$user_bin_dir" ]]; then
+    case ":$PATH:" in
+      *":$user_bin_dir:"*) ;;
+      *) export PATH="$user_bin_dir:$PATH" ;;
+    esac
+  fi
+}
+
+_rigor_bin="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/rigor"
+[[ -x "$_rigor_bin" ]] || _err "rigor not found at ${_rigor_bin} — check rigor-cli installation"
+
+backend_cmd="ruff"
+install_backend=0
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --backend-cmd)
+      shift
+      [[ $# -gt 0 ]] || _err "--backend-cmd requires a value"
+      backend_cmd="$1"
+      ;;
+    --install)
+      install_backend=1
+      ;;
+    -h|--help)
+      _usage
+      exit 0
+      ;;
+    *)
+      _err "Unknown argument: $1"
+      ;;
+  esac
+  shift
+done
+
+repo_root="$(_repo_root || true)"
+[[ -n "$repo_root" ]] || _err "Run from inside a git repository"
+cd "$repo_root"
+
+if [[ ! -f .github/copilot-instructions.md ]]; then
+  _warn "Missing .github/copilot-instructions.md; review defaults will be weaker"
+fi
+
+if command -v "$backend_cmd" >/dev/null 2>&1; then
+  printf 'Backend ready: %s\n' "$backend_cmd"
+  exit 0
+fi
+
+case "$backend_cmd" in
+  ruff)
+    if [[ "$install_backend" -eq 1 ]]; then
+      _install_ruff
+      command -v "$backend_cmd" >/dev/null 2>&1 || \
+        _err "ruff installation did not expose the command on PATH"
+      printf 'Backend installed: %s\n' "$backend_cmd"
+    else
+      _err "Missing backend command: ${backend_cmd}. Re-run with --install to install it."
+    fi
+    ;;
+  *)
+    _err "Missing backend command: ${backend_cmd}. No installer is defined for this backend."
+    ;;
+esac

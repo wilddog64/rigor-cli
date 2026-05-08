@@ -1,0 +1,227 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+_repo_root() {
+  git rev-parse --show-toplevel 2>/dev/null
+}
+
+_usage() {
+  cat <<'EOF'
+Usage: ai-review [--prompt TEXT] [--prompt-file FILE] [--model MODEL] [--fail-on-findings|--exit-code] [rigor review args...]
+
+Run rigor review with a configurable default prompt, stdin support, and Copilot instructions.
+
+Piped stdin is accepted as review context:
+  git diff main...HEAD | bin/ai-review
+
+Default prompt resolution order (first match wins):
+  1. RIGOR_REVIEW_DEFAULT_PROMPT env var
+  2. .rigor/review-prompt file in repo root
+  3. Built-in generic default
+
+Use --fail-on-findings or --exit-code when CI should return non-zero for findings.
+The review output must then end with AI_REVIEW_RESULT: findings or AI_REVIEW_RESULT: no-findings.
+
+Environment:
+  RIGOR_REVIEW_DEFAULT_PROMPT   Override the default review prompt
+  RIGOR_REVIEW_MAX_LINES        Truncate stdin diff at this many lines (default: 1000)
+  AI_REVIEW_PROMPT              Override the prompt for this invocation
+  AI_REVIEW_MODEL               Model to pass to rigor review
+  AI_REVIEW_STREAM              Streaming mode: on|off (default: on)
+  AI_REVIEW_FAIL_ON_FINDINGS    Set to 1 to enable fail-on-findings mode
+  AI_RIGOR_BIN                  Path to rigor binary (default: sibling rigor in same bin/)
+EOF
+}
+
+_warn() {
+  printf 'WARN: %s\n' "$*" >&2
+}
+
+_redact_forbidden_fragments() {
+  local text="$1"
+  local fragment
+  local -a forbidden=(
+    "shell(git push --force)"
+    "shell(git push)"
+    "shell(cd"
+    "shell(rm"
+    "shell(eval"
+    "shell(sudo"
+    "shell(curl"
+    "shell(wget"
+  )
+  for fragment in "${forbidden[@]}"; do
+    text="${text//"$fragment"/[redacted restricted shell fragment]}"
+  done
+  printf '%s' "$text"
+}
+
+_load_default_prompt() {
+  local repo_root="$1"
+  if [[ -n "${RIGOR_REVIEW_DEFAULT_PROMPT:-}" ]]; then
+    printf '%s' "$RIGOR_REVIEW_DEFAULT_PROMPT"
+    return
+  fi
+  local prompt_file="$repo_root/.rigor/review-prompt"
+  if [[ -f "$prompt_file" ]]; then
+    cat "$prompt_file"
+    return
+  fi
+  printf 'Review this change for correctness, backward compatibility, and missing tests or docs. Prioritize behavior regressions and security risks over style-only comments.'
+}
+
+_default_rigor_bin="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/rigor"
+prompt_file=""
+model="${AI_REVIEW_MODEL:-}"
+stream_mode="${AI_REVIEW_STREAM:-on}"
+fail_on_findings="${AI_REVIEW_FAIL_ON_FINDINGS:-0}"
+stdin_contents=""
+stdin_has_data=0
+
+repo_root="$(_repo_root || true)"
+[[ -n "$repo_root" ]] || _warn "Not inside a git repository; using current directory"
+repo_root="${repo_root:-$(pwd)}"
+cd "$repo_root"
+rigor_bin="${AI_RIGOR_BIN:-$_default_rigor_bin}"
+
+[[ -x "$rigor_bin" ]] || {
+  printf 'ERROR: rigor not found at %s — check rigor-cli installation\n' "$rigor_bin" >&2
+  exit 1
+}
+
+default_prompt="$(_load_default_prompt "$repo_root")"
+prompt="${AI_REVIEW_PROMPT:-$default_prompt}"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --prompt)
+      shift
+      [[ $# -gt 0 ]] || { printf 'ERROR: --prompt requires a value\n' >&2; exit 1; }
+      prompt="$1"
+      ;;
+    --prompt-file)
+      shift
+      [[ $# -gt 0 ]] || { printf 'ERROR: --prompt-file requires a value\n' >&2; exit 1; }
+      prompt_file="$1"
+      ;;
+    --model)
+      shift
+      [[ $# -gt 0 ]] || { printf 'ERROR: --model requires a value\n' >&2; exit 1; }
+      model="$1"
+      ;;
+    --fail-on-findings|--exit-code)
+      fail_on_findings=1
+      ;;
+    -h|--help)
+      _usage
+      exit 0
+      ;;
+    --)
+      shift
+      break
+      ;;
+    *)
+      break
+      ;;
+  esac
+  shift
+done
+
+prompt="$(_redact_forbidden_fragments "$prompt")"
+
+_max_lines="${RIGOR_REVIEW_MAX_LINES:-1000}"
+
+if [[ ! -t 0 ]]; then
+  stdin_contents="$(cat)"
+  if [[ -n "$stdin_contents" ]]; then
+    stdin_has_data=1
+    line_count="$(printf '%s\n' "$stdin_contents" | wc -l | tr -d ' ')"
+    if [[ "$line_count" -gt "$_max_lines" ]]; then
+      _warn "Diff is ${line_count} lines; truncating to ${_max_lines} (set RIGOR_REVIEW_MAX_LINES to override)"
+      stdin_contents="$(printf '%s\n' "$stdin_contents" | head -n "$_max_lines")
+
+[... diff truncated at ${_max_lines} lines — remaining changes not reviewed ...]"
+    fi
+    stdin_contents="$(_redact_forbidden_fragments "$stdin_contents")"
+  fi
+fi
+
+if [[ -n "$prompt_file" ]]; then
+  [[ -f "$prompt_file" ]] || { printf 'ERROR: prompt file not found: %s\n' "$prompt_file" >&2; exit 1; }
+  prompt_file_contents="$(_redact_forbidden_fragments "$(cat "$prompt_file")")"
+else
+  prompt_file_contents=""
+fi
+
+review_args=()
+if [[ -n "$model" ]]; then
+  review_args+=(--model "$model")
+fi
+
+has_stream=0
+for arg in "$@"; do
+  [[ "$arg" == "--stream" ]] && { has_stream=1; break; }
+done
+if [[ "$has_stream" -eq 0 ]]; then
+  review_args+=(--stream "$stream_mode")
+fi
+
+if [[ ! -f .github/copilot-instructions.md ]]; then
+  _warn "Missing .github/copilot-instructions.md; review will fall back to Copilot defaults"
+fi
+
+review_style_prompt='Respond in GitHub PR review style. Start with a short Summary, then Findings, then Notes or Suggestions. Keep comments concise and actionable. When possible, mention file paths and line numbers. If there are no findings, say that explicitly.'
+
+final_prompt="$review_style_prompt
+
+Review instruction:
+$prompt"
+
+if [[ "$fail_on_findings" -eq 1 ]]; then
+  final_prompt="$final_prompt
+
+When you finish, end with exactly one final line of either AI_REVIEW_RESULT: findings if there are one or more findings, or AI_REVIEW_RESULT: no-findings if there are no findings."
+fi
+
+if [[ -n "$prompt_file_contents" ]]; then
+  final_prompt="$final_prompt
+
+Review context from --prompt-file (${prompt_file}):
+$prompt_file_contents"
+fi
+
+if [[ "$stdin_has_data" -eq 1 ]]; then
+  final_prompt="$final_prompt
+
+Review context from stdin:
+$stdin_contents"
+fi
+
+if [[ "$fail_on_findings" -eq 1 ]]; then
+  review_output_file="$(mktemp "${TMPDIR:-/tmp}/ai-review-output.XXXXXX")"
+  cleanup_review_output_file() {
+    [[ -n "${review_output_file:-}" && -f "$review_output_file" ]] && rm -f "$review_output_file"
+  }
+  trap cleanup_review_output_file EXIT INT TERM HUP
+
+  set +e
+  "$rigor_bin" review --prompt "$final_prompt" "${review_args[@]}" "$@" >"$review_output_file" 2>&1
+  review_rc=$?
+  set -e
+
+  cat "$review_output_file"
+  if [[ "$review_rc" -ne 0 ]]; then
+    exit "$review_rc"
+  fi
+  if grep -q '^AI_REVIEW_RESULT: findings$' "$review_output_file"; then
+    exit 1
+  fi
+  if grep -q '^AI_REVIEW_RESULT: no-findings$' "$review_output_file"; then
+    exit 0
+  fi
+
+  _warn "Review output did not include AI_REVIEW_RESULT marker; failing closed"
+  exit 1
+fi
+
+exec "$rigor_bin" review --prompt "$final_prompt" "${review_args[@]}" "$@"

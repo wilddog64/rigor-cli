@@ -1,5 +1,14 @@
 # Changes — rigor-cli
 
+## [v0.1.5] — 2026-05-08
+
+### Added
+- `bin/ai-bootstrap`: checks/installs the lint backend (default: ruff); verifies rigor is present; `RIGOR_PYTHON_BIN` configures the Python interpreter
+- `bin/ai-lint`: wraps `rigor lint`; sets `RIGOR_LINT_BACKENDS` from `RIGOR_LINT_BACKEND_CMD` (default: `py:ruff`); verifies rigor is present before exec
+- `bin/ai-review`: wraps `rigor review`; configurable default prompt via `RIGOR_REVIEW_DEFAULT_PROMPT` env var, `.rigor/review-prompt` file, or built-in generic default; `--fail-on-findings` CI mode; stdin piping; prompt redaction; `RIGOR_REVIEW_MAX_LINES` diff cap (default: 1000) with truncation warning
+- `scripts/tests/rigor.bats`: 8 new tests covering all three helpers
+
+
 ## [v0.1.4] — 2026-05-03
 
 ### Added
