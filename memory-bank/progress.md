@@ -45,9 +45,9 @@
 
 ## What Is Pending
 
-### Next Work
+### v0.1.5
 
-- `rigor-cli-v0.1.5` branch will carry post-release cleanup and pyjenkinsapi subtree integration.
+- [ ] **ai-helpers** — spec: `docs/plans/v0.1.5-ai-helpers.md`; add `bin/ai-bootstrap`, `bin/ai-lint`, `bin/ai-review`; configurable prompt via `.rigor/review-prompt` / `RIGOR_REVIEW_DEFAULT_PROMPT`; 7 BATS tests. Two-repo: rigor-cli (`rigor-cli-v0.1.5`) + pyjenkinsapi (`feat/rigor-cli-ai-helpers`).
 
 ---
 
