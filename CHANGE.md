@@ -1,5 +1,12 @@
 # Changes — rigor-cli
 
+## [v0.1.6] — 2026-05-08
+
+### Fixed
+- Resolve symlink in `${BASH_SOURCE[0]}` before locating `rigor` binary — `bin/ai-bootstrap`, `bin/ai-lint`, `bin/ai-review` now work correctly when invoked through a symlink
+
+---
+
 ## [v0.1.5] — 2026-05-08
 
 ### Added
