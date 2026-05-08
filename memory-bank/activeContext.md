@@ -15,7 +15,7 @@
 
 ## Current Focus
 - Branch `rigor-cli-v0.1.5` is the next working branch.
-- **OPEN:** `feat(bin)` — spec: `docs/plans/v0.1.5-ai-helpers.md`; add `ai-bootstrap`, `ai-lint`, `ai-review` to rigor-cli `bin/`; pyjenkinsapi switches to symlinks + `.rigor/review-prompt`.
+- **ASSIGNED → Gemini:** `feat(bin)` — spec: `docs/plans/v0.1.5-ai-helpers.md`; add `ai-bootstrap`, `ai-lint`, `ai-review` to rigor-cli `bin/`; pyjenkinsapi switches to symlinks + `.rigor/review-prompt`.
 
 ---
 
