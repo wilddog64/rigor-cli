@@ -83,9 +83,9 @@ _default_rigor_bin="$(cd -- "$(dirname -- "$_self")" && pwd)/rigor"
 
 ## Definition of Done
 
-- [ ] `bin/ai-review --help` works when called through pyjenkinsapi symlink
-- [ ] `shellcheck -S warning` passes on all three files
-- [ ] Committed and pushed to `rigor-cli-v0.1.6`
+- [x] `bin/ai-review --help` works when called through pyjenkinsapi symlink
+- [x] `shellcheck -S warning` passes on all three files
+- [x] Committed and pushed to `rigor-cli-v0.1.6`
 
 **Commit message:**
 ```
