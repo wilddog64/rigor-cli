@@ -1,79 +1,13 @@
 # Active Context — rigor-cli
 
-## Current State: `rigor-cli-v0.1.5` (as of 2026-05-03)
+## Current Branch: `rigor-cli-v0.1.5`
 
-**v0.1.0 SHIPPED** — PR #1 merged to main (`f720184`), tagged v0.1.0, GitHub release created 2026-03-24. `enforce_admins` restored.
-**PR #2 MERGED** — `e302af4f` 2026-03-24 — README Scope section + v0.1.0 retro + Copilot PR#2 fixes. `enforce_admins` restored.
-**PR #3 MERGED** — `f304c14` 2026-03-24 — mapfile compat + gist-01; Copilot 4 findings fixed; enforce_admins restored.
-**PR #4 MERGED** — `c5bda1e` 2026-03-25 — v0.1.1 milestone close-out; symlink debt resolved; how-to doc; Copilot 2 findings fixed. `enforce_admins` restored.
-**v0.1.1 SHIPPED** — tagged `c5bda1e`, GitHub release created 2026-03-25.
-**PR #5 MERGED** — `5ed7f8d` 2026-03-25 — v0.1.2 lib-foundation v0.3.11 subtree pull; YAML IP audit; Copilot 2 findings fixed. `enforce_admins` restored.
-**v0.1.2 SHIPPED** — tagged `5ed7f8d`, GitHub release created 2026-03-25.
-**PR #6 MERGED** — `675f6e9` 2026-05-03 — `rigor review` subcommand; lib-foundation v0.3.20 subtree pull; Copilot 4 findings fixed. `enforce_admins` restored.
-**v0.1.3 SHIPPED** — tagged `306cd86`, GitHub release created 2026-05-03. `enforce_admins` restored.
-**v0.1.4 SHIPPED** — PR #7 merged to main (`ac7a39d`), `rigor lint` now dispatches per-extension via `RIGOR_LINT_BACKENDS`. Release docs and memory-bank were updated in the merge commit.
+**Status:** Implementation of ai-* helper scripts complete.
 
-## Current Focus
-- Branch `rigor-cli-v0.1.5` is the next working branch.
-- **ASSIGNED → Gemini:** `feat(bin)` — spec: `docs/plans/v0.1.5-ai-helpers.md`; add `ai-bootstrap`, `ai-lint`, `ai-review` to rigor-cli `bin/`; pyjenkinsapi switches to symlinks + `.rigor/review-prompt`.
+## Recent Changes
+- **ai-* helpers** — COMPLETE (`71b3c84`). Added `ai-bootstrap`, `ai-lint`, and `ai-review` helper scripts to `bin/`. These scripts wrap `rigor` and provide repo-agnostic linting and review logic.
+- **Consumer migration** — COMPLETE (`f0444a5` in pyjenkinsapi). Replaced standalone scripts with symlinks to rigor-cli vendor path.
 
----
-
-## Purpose
-
-Standalone CLI exposing lib-foundation's agent rigor framework as four subcommands:
-- `bin/rigor checkpoint` — `_agent_checkpoint`: stage all + commit
-- `bin/rigor audit` — `_agent_audit`: staged .sh file checks (if-count, bare sudo, credentials, tab indent)
-- `bin/rigor lint` — `_agent_lint` / shellcheck: all .sh files in repo
-- `bin/rigor review` — `_ai_agent_review`: AI-assisted review via configured backend (default: Copilot)
-
-lib-foundation consumed via git subtree at `scripts/lib/foundation/`.
-
----
-
-## Version Roadmap
-
-| Version | Status | Notes |
-|---|---|---|
-| v0.1.0 | **SHIPPED** | PR #1 merged (`f720184`) — initial dispatcher + subtree + BATS 3 tests; 2026-03-24; tagged v0.1.0 |
-| v0.1.1 | **SHIPPED** | PR #4 merged (`c5bda1e`) — bash 3.2 compat, gist-01 install, subtree path fix; 2026-03-25; tagged v0.1.1 |
-| v0.1.2 | **SHIPPED** | PR #5 merged (`5ed7f8d`) — lib-foundation v0.3.11 subtree pull, YAML IP audit; 2026-03-25; tagged v0.1.2 |
-| v0.1.3 | **SHIPPED** | PR #6 merged (`675f6e9`) — `rigor review`; tagged `306cd86` |
-| v0.1.4 | **SHIPPED** | PR #7 merged (`ac7a39d`) — multi-language lint via `RIGOR_LINT_BACKENDS` |
-
----
-
-## Open Items
-
-- [x] **PR #1** — merged `f720184`; tagged v0.1.0; GitHub release created
-- [x] **PR #2** — merged `e302af4f`; README Scope section; v0.1.0 retro; Copilot PR#2 findings fixed; `enforce_admins` restored
-- [x] **PR #3** — merged `f304c14`; mapfile compat + gist-01; Copilot 4 findings fixed; enforce_admins restored
-- [x] **lib-foundation `.clinerules` fix** — PR #16 merged (`c5662c9`); subtree pulled into rigor-cli
-- [x] **Symlink tech debt** — `_RIGOR_LIB_DIR` updated to real subtree path (`c283d48`); BATS 3/3
-- [x] **Gist 1 publish** — https://gist.github.com/wilddog64/81c767a0560e39c8d6e0f8bd9706973b
-- [x] **PR #4** — merged `c5bda1e`; v0.1.1 tagged + released; enforce_admins restored; retro written
-
----
-
-## Key Contracts (must not change without coordinating consumers)
-
-- `bin/rigor checkpoint | audit | lint` — subcommand signatures
-- `scripts/lib/foundation/` — read-only subtree; never edit directly
-
----
-
-## Consumers
-
-| Repo | Integration | Status |
-|---|---|---|
-| any Bash repo | git subtree via gist-01 install | available |
-| k3d-manager | subtree pull (future) | not yet wired |
-
----
-
-## Engineering Protocol
-
-- **Tests**: always run with `env -i PATH="/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin" HOME="$HOME" TMPDIR="$TMPDIR" bash --norc --noprofile -c 'bats scripts/tests/rigor.bats'`
-- **shellcheck**: `shellcheck bin/rigor` before every commit
-- **Subtree updates**: `git subtree pull --prefix=scripts/lib/foundation https://github.com/wilddog64/lib-foundation.git main --squash`
-- **All changes originate here** — never edit `scripts/lib/foundation/` directly
+## Next Steps
+- Release v0.1.5 after PR merge.
+- Phase 4: Full integration tests with various consumer repos.
