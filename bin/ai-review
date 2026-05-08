@@ -24,7 +24,7 @@ The review output must then end with AI_REVIEW_RESULT: findings or AI_REVIEW_RES
 
 Environment:
   RIGOR_REVIEW_DEFAULT_PROMPT   Override the default review prompt
-  RIGOR_REVIEW_MAX_LINES        Truncate stdin diff at this many lines (default: 1000)
+  RIGOR_REVIEW_MAX_LINES        Truncate stdin diff at this many lines (default: 5000)
   AI_REVIEW_PROMPT              Override the prompt for this invocation
   AI_REVIEW_MODEL               Model to pass to rigor review
   AI_REVIEW_STREAM              Streaming mode: on|off (default: on)
@@ -135,7 +135,7 @@ done
 
 prompt="$(_redact_forbidden_fragments "$prompt")"
 
-_max_lines="${RIGOR_REVIEW_MAX_LINES:-1000}"
+_max_lines="${RIGOR_REVIEW_MAX_LINES:-5000}"
 
 if [[ ! -t 0 ]]; then
   stdin_contents="$(cat)"
