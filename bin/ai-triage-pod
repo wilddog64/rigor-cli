@@ -7,13 +7,15 @@ _repo_root() {
 
 _usage() {
   cat <<'EOF'
-Usage: ai-triage-pod [--context-file FILE] [--tail N] <namespace> <pod-name>
+Usage: ai-triage-pod [-f FILE] [--tail N] [<namespace> <pod-name>]
 
 Collect kubectl describe + logs for a pod and send the context to ai-review.
 Optional stdin and --context-file content are appended as extra triage context.
+If --context-file/-f is provided, pod collection is skipped and the file/stdin
+content is sent directly to ai-review.
 
 Options:
-  --context-file FILE  Append extra context from FILE
+  -f, --context-file FILE  Append extra context from FILE, or read stdin when FILE is -
   --tail N             Number of log lines to collect (default: AI_TRIAGE_LOG_TAIL or 100)
   -h, --help           Show this help text
 
@@ -45,14 +47,16 @@ command -v kubectl >/dev/null 2>&1 || _err "kubectl not found on PATH"
 namespace=""
 pod_name=""
 context_file=""
+context_only=0
 tail_lines="${AI_TRIAGE_LOG_TAIL:-100}"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --context-file)
+    -f|--context-file)
       shift
       [[ $# -gt 0 ]] || _err "--context-file requires a value"
       context_file="$1"
+      context_only=1
       ;;
     --tail)
       shift
@@ -80,12 +84,12 @@ while [[ $# -gt 0 ]]; do
   shift
 done
 
-if [[ -z "$namespace" || -z "$pod_name" ]]; then
-  _err "Usage: ai-triage-pod [--context-file FILE] [--tail N] <namespace> <pod-name>"
+if [[ "$context_only" -eq 0 && ( -z "$namespace" || -z "$pod_name" ) ]]; then
+  _err "Usage: ai-triage-pod [-f FILE] [--tail N] [<namespace> <pod-name>]"
 fi
 
 [[ "$tail_lines" =~ ^[0-9]+$ ]] || _err "--tail requires a non-negative integer"
-if [[ -n "$context_file" && ! -f "$context_file" ]]; then
+if [[ -n "$context_file" && "$context_file" != "-" && ! -f "$context_file" ]]; then
   _err "Context file not found: ${context_file}"
 fi
 
@@ -96,22 +100,30 @@ else
   _warn "Not inside a git repository; using current directory"
 fi
 
-if [[ ! -t 0 ]]; then
+if [[ "$context_file" == "-" || ( "$context_only" -eq 0 && ! -t 0 ) ]]; then
   stdin_context="$(cat)"
 else
   stdin_context=""
 fi
 
-pod_context="$(
-  printf '=== kubectl describe pod ===\n'
-  kubectl describe pod -n "$namespace" "$pod_name" 2>&1 || true
-  printf '\n=== last %s log lines ===\n' "$tail_lines"
-  kubectl logs -n "$namespace" "$pod_name" --previous --tail="$tail_lines" 2>&1 || \
-    kubectl logs -n "$namespace" "$pod_name" --tail="$tail_lines" 2>&1 || true
-)"
+pod_context=""
+if [[ "$context_only" -eq 0 && -n "$namespace" && -n "$pod_name" ]]; then
+  pod_context="$(
+    printf '=== kubectl describe pod ===\n'
+    kubectl describe pod -n "$namespace" "$pod_name" 2>&1 || true
+    printf '\n=== last %s log lines ===\n' "$tail_lines"
+    kubectl logs -n "$namespace" "$pod_name" --previous --tail="$tail_lines" 2>&1 || \
+      kubectl logs -n "$namespace" "$pod_name" --tail="$tail_lines" 2>&1 || true
+  )"
+fi
 
 if [[ -n "$context_file" ]]; then
-  context_file_contents="$(cat "$context_file")"
+  if [[ "$context_file" == "-" ]]; then
+    context_file_contents="$stdin_context"
+    stdin_context=""
+  else
+    context_file_contents="$(cat "$context_file")"
+  fi
   pod_context="${pod_context}
 === context file: ${context_file} ===
 ${context_file_contents}"

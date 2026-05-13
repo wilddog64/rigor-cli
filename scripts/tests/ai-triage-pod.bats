@@ -30,6 +30,7 @@ teardown() {
   run bin/ai-triage-pod --help
   [ "$status" -eq 0 ]
   [[ "$output" == *"Usage: ai-triage-pod"* ]]
+  [[ "$output" == *"-f, --context-file FILE"* ]]
 }
 
 @test "ai-triage-pod fails when arguments are missing" {
@@ -39,7 +40,7 @@ teardown() {
   [[ "$output" == *"Usage: ai-triage-pod"* ]]
 }
 
-@test "ai-triage-pod collects describe, logs, stdin, and context file content" {
+@test "ai-triage-pod collects describe, logs, and context file content" {
   cd "$BATS_TEST_TMPDIR" || exit 1
 
   printf '#!/usr/bin/env bash\nprintf "ai-review: %%s\\n" "$*"\n' \
@@ -57,6 +58,42 @@ teardown() {
   [[ "$output" == *"logs:logs -n identity keycloak-1 --previous --tail=42"* ]]
   [[ "$output" == *"=== context file: context.txt ==="* ]]
   [[ "$output" == *"file-context"* ]]
-  [[ "$output" == *"=== stdin context ==="* ]]
-  [[ "$output" == *"stdin-context"* ]]
+}
+
+@test "ai-triage-pod -f file skips pod collection" {
+  cd "$BATS_TEST_TMPDIR" || exit 1
+
+  printf '#!/usr/bin/env bash\nprintf "ai-review: %%s\\n" "$*"\n' \
+    > "$BATS_TEST_TMPDIR/bin/ai-review" && chmod +x "$BATS_TEST_TMPDIR/bin/ai-review"
+
+  printf '#!/usr/bin/env bash\nprintf "kubectl:%s\\n" "$*" >&2\nexit 1\n' \
+    > "$BATS_TEST_TMPDIR/bin/kubectl" && chmod +x "$BATS_TEST_TMPDIR/bin/kubectl"
+
+  printf 'file-only-context' > "$BATS_TEST_TMPDIR/context.txt"
+
+  run bin/ai-triage-pod -f context.txt
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"ai-review:"* ]]
+  [[ "$output" == *"=== context file: context.txt ==="* ]]
+  [[ "$output" == *"file-only-context"* ]]
+  [[ "$output" != *"describe pod"* ]]
+  [[ "$output" != *"last 100 log lines"* ]]
+}
+
+@test "ai-triage-pod -f - reads stdin without pod collection" {
+  cd "$BATS_TEST_TMPDIR" || exit 1
+
+  printf '#!/usr/bin/env bash\nprintf "ai-review: %%s\\n" "$*"\n' \
+    > "$BATS_TEST_TMPDIR/bin/ai-review" && chmod +x "$BATS_TEST_TMPDIR/bin/ai-review"
+
+  printf '#!/usr/bin/env bash\nprintf "kubectl:%s\\n" "$*" >&2\nexit 1\n' \
+    > "$BATS_TEST_TMPDIR/bin/kubectl" && chmod +x "$BATS_TEST_TMPDIR/bin/kubectl"
+
+  run bash -c "printf 'stdin-only-context' | bin/ai-triage-pod -f -"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"ai-review:"* ]]
+  [[ "$output" == *"=== context file: - ==="* ]]
+  [[ "$output" == *"stdin-only-context"* ]]
+  [[ "$output" != *"describe pod"* ]]
+  [[ "$output" != *"last 100 log lines"* ]]
 }
