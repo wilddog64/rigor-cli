@@ -19,6 +19,7 @@
 
 ## Completed (v0.1.6)
 - [x] Add `bin/ai-triage-pod` for Kubernetes pod triage with optional stdin/file context (`4f47a2c`)
+- [x] Add `-f FILE` / `-f -` context-only mode to `bin/ai-triage-pod` (`469474d`)
 - [x] Document `ai-triage-pod` in `docs/howto/ai-triage-pod.md` and `docs/howto/use-ai-helpers.md`
 - [x] Add BATS coverage for the new helper
 
