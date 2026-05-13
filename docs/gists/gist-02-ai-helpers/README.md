@@ -1,7 +1,7 @@
 # gist-02: ai-helpers one-command setup
 
 Pulls [rigor-cli](https://github.com/wilddog64/rigor-cli) as a subtree and wires
-`bin/ai-bootstrap`, `bin/ai-lint`, `bin/ai-review` as relative symlinks.
+`bin/ai-bootstrap`, `bin/ai-lint`, `bin/ai-review`, `bin/ai-triage-pod` as relative symlinks.
 
 ## Usage
 
@@ -24,6 +24,7 @@ bash setup-ai-helpers.sh --update
 | `bin/ai-bootstrap` symlink | checks/installs ruff lint backend |
 | `bin/ai-lint` symlink | runs `rigor lint` with per-language backend mapping |
 | `bin/ai-review` symlink | runs `rigor review` with configurable prompt + CI mode |
+| `bin/ai-triage-pod` symlink | gathers pod describe/logs and asks `ai-review` to diagnose |
 
 ## Update later
 

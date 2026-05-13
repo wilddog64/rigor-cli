@@ -1,5 +1,12 @@
 # Changes — rigor-cli
 
+## [Unreleased]
+
+### Added
+- `bin/ai-triage-pod`: collects `kubectl describe pod` + recent logs, appends optional stdin and `--context-file` content, then sends the bundle to `ai-review`
+- `docs/howto/ai-triage-pod.md`: usage guide for pod triage and optional context inputs
+- `docs/howto/use-ai-helpers.md`: helper index updated to include `ai-triage-pod`
+
 ## [v0.1.6] — 2026-05-08
 
 ### Fixed

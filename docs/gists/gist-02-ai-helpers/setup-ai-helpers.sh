@@ -8,7 +8,7 @@
 #
 # What it does:
 #   1. git subtree add/pull rigor-cli at <prefix>/
-#   2. Creates bin/ai-bootstrap, bin/ai-lint, bin/ai-review as relative symlinks
+#   2. Creates bin/ai-bootstrap, bin/ai-lint, bin/ai-review, bin/ai-triage-pod as relative symlinks
 
 set -euo pipefail
 
@@ -57,7 +57,7 @@ _create_symlinks() {
   local prefix="$1" bin_dir="$2"
   mkdir -p "$bin_dir"
   local helper
-  for helper in ai-bootstrap ai-lint ai-review; do
+  for helper in ai-bootstrap ai-lint ai-review ai-triage-pod; do
     local link="${bin_dir}/${helper}"
     local target
     target="$(_rel_path "$bin_dir" "${prefix}/bin/${helper}")"
@@ -81,7 +81,7 @@ _create_symlinks() {
 _verify_symlinks() {
   local bin_dir="$1" prefix="$2"
   local helper ok=1
-  for helper in ai-bootstrap ai-lint ai-review; do
+  for helper in ai-bootstrap ai-lint ai-review ai-triage-pod; do
     local link="${bin_dir}/${helper}"
     if [[ ! -L "$link" ]]; then
       _warn "Missing symlink: ${link}"
@@ -129,7 +129,7 @@ main() {
   _create_symlinks "$prefix" "$bin_dir"
   _verify_symlinks "$bin_dir" "$prefix"
 
-  _info "Done. Try: ${bin_dir}/ai-bootstrap --help"
+  _info "Done. Try: ${bin_dir}/ai-triage-pod --help"
 }
 
 main "$@"

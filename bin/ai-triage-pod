@@ -1,0 +1,130 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+_repo_root() {
+  git rev-parse --show-toplevel 2>/dev/null
+}
+
+_usage() {
+  cat <<'EOF'
+Usage: ai-triage-pod [--context-file FILE] [--tail N] <namespace> <pod-name>
+
+Collect kubectl describe + logs for a pod and send the context to ai-review.
+Optional stdin and --context-file content are appended as extra triage context.
+
+Options:
+  --context-file FILE  Append extra context from FILE
+  --tail N             Number of log lines to collect (default: AI_TRIAGE_LOG_TAIL or 100)
+  -h, --help           Show this help text
+
+Environment:
+  AI_TRIAGE_LOG_TAIL   Default log tail line count (default: 100)
+EOF
+}
+
+_warn() {
+  printf 'WARN: %s\n' "$*" >&2
+}
+
+_err() {
+  printf 'ERROR: %s\n' "$*" >&2
+  exit 1
+}
+
+_self="${BASH_SOURCE[0]}"
+if [[ -L "$_self" ]]; then
+  _link="$(readlink "$_self")"
+  [[ "$_link" != /* ]] && _link="$(cd "$(dirname "$_self")" && pwd)/$_link"
+  _self="$_link"
+fi
+
+_ai_review_bin="$(cd -- "$(dirname -- "$_self")" && pwd)/ai-review"
+[[ -x "$_ai_review_bin" ]] || _err "ai-review not found at ${_ai_review_bin} — check rigor-cli installation"
+command -v kubectl >/dev/null 2>&1 || _err "kubectl not found on PATH"
+
+namespace=""
+pod_name=""
+context_file=""
+tail_lines="${AI_TRIAGE_LOG_TAIL:-100}"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --context-file)
+      shift
+      [[ $# -gt 0 ]] || _err "--context-file requires a value"
+      context_file="$1"
+      ;;
+    --tail)
+      shift
+      [[ $# -gt 0 ]] || _err "--tail requires a value"
+      tail_lines="$1"
+      ;;
+    -h|--help)
+      _usage
+      exit 0
+      ;;
+    --)
+      shift
+      break
+      ;;
+    *)
+      if [[ -z "$namespace" ]]; then
+        namespace="$1"
+      elif [[ -z "$pod_name" ]]; then
+        pod_name="$1"
+      else
+        _err "Unexpected argument: $1"
+      fi
+      ;;
+  esac
+  shift
+done
+
+if [[ -z "$namespace" || -z "$pod_name" ]]; then
+  _err "Usage: ai-triage-pod [--context-file FILE] [--tail N] <namespace> <pod-name>"
+fi
+
+[[ "$tail_lines" =~ ^[0-9]+$ ]] || _err "--tail requires a non-negative integer"
+if [[ -n "$context_file" && ! -f "$context_file" ]]; then
+  _err "Context file not found: ${context_file}"
+fi
+
+repo_root="$(_repo_root || true)"
+if [[ -n "$repo_root" ]]; then
+  cd "$repo_root"
+else
+  _warn "Not inside a git repository; using current directory"
+fi
+
+if [[ ! -t 0 ]]; then
+  stdin_context="$(cat)"
+else
+  stdin_context=""
+fi
+
+pod_context="$(
+  printf '=== kubectl describe pod ===\n'
+  kubectl describe pod -n "$namespace" "$pod_name" 2>&1 || true
+  printf '\n=== last %s log lines ===\n' "$tail_lines"
+  kubectl logs -n "$namespace" "$pod_name" --previous --tail="$tail_lines" 2>&1 || \
+    kubectl logs -n "$namespace" "$pod_name" --tail="$tail_lines" 2>&1 || true
+)"
+
+if [[ -n "$context_file" ]]; then
+  context_file_contents="$(cat "$context_file")"
+  pod_context="${pod_context}
+=== context file: ${context_file} ===
+${context_file_contents}"
+fi
+
+if [[ -n "$stdin_context" ]]; then
+  pod_context="${pod_context}
+=== stdin context ===
+${stdin_context}"
+fi
+
+final_prompt="Diagnose this Kubernetes pod failure and suggest a fix. Focus on the root cause, the relevant configuration, and the smallest safe remediation. Do not run any commands.
+
+${pod_context}"
+
+exec "$_ai_review_bin" --prompt "$final_prompt"

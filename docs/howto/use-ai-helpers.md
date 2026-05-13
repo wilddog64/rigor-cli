@@ -1,6 +1,6 @@
 # How-To: Use the ai-* Helpers
 
-`ai-bootstrap`, `ai-lint`, and `ai-review` are thin wrappers in `bin/` that
+`ai-bootstrap`, `ai-lint`, `ai-review`, and `ai-triage-pod` are thin wrappers in `bin/` that
 make rigor-cli easier to invoke from CI, pre-commit hooks, or the shell.
 They live in `rigor-cli/bin/` and are consumed by client repos via symlinks.
 
@@ -14,7 +14,7 @@ Run once from the client repo root:
 bash tools/rigor-cli/docs/gists/gist-02-ai-helpers/setup-ai-helpers.sh
 ```
 
-This creates `bin/ai-bootstrap`, `bin/ai-lint`, `bin/ai-review` as relative
+This creates `bin/ai-bootstrap`, `bin/ai-lint`, `bin/ai-review`, `bin/ai-triage-pod` as relative
 symlinks into `tools/rigor-cli/bin/`. After a subtree pull, re-run with `--update`
 to refresh the symlinks.
 
@@ -91,6 +91,24 @@ bin/ai-review --model claude-sonnet-4-6
 The review output must end with `AI_REVIEW_RESULT: findings` or
 `AI_REVIEW_RESULT: no-findings` for `--fail-on-findings` to work. If the marker
 is absent, the step fails closed.
+
+---
+
+## ai-triage-pod
+
+Collects pod describe/log context and sends it to `ai-review` for diagnosis.
+
+```bash
+bin/ai-triage-pod identity keycloak-745b995454-h859q
+bin/ai-triage-pod --context-file notes.txt identity keycloak-745b995454-h859q
+printf 'LDAP bind failed after secret rotation' | bin/ai-triage-pod identity keycloak-745b995454-h859q
+```
+
+| Env var | Default | Purpose |
+|---------|---------|---------|
+| `AI_TRIAGE_LOG_TAIL` | `100` | Number of log lines to collect from the target pod |
+
+`ai-triage-pod` appends stdin and `--context-file` contents to the generated review prompt before handing off to `ai-review`.
 
 ---
 

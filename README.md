@@ -2,7 +2,7 @@
 
 Standalone CLI for the [lib-foundation](https://github.com/wilddog64/lib-foundation) agent rigor framework. Enforces code quality across any language — runs as a pre-commit hook, in CI, or on demand.
 
-Four subcommands cover the full spec-driven workflow: `audit` catches style and security violations at commit time, `lint` runs configured static analysis per language, `checkpoint` creates a safe mid-task save point during development, and `review` runs AI-assisted review via the configured backend. No Kubernetes dependency — works with any project.
+Four subcommands cover the full spec-driven workflow: `audit` catches style and security violations at commit time, `lint` runs configured static analysis per language, `checkpoint` creates a safe mid-task save point during development, and `review` runs AI-assisted review via the configured backend. The `bin/ai-*` helpers extend that flow with backend setup, linting, review, and pod triage. No Kubernetes dependency — works with any project.
 
 ## Scope
 
@@ -11,6 +11,7 @@ rigor-cli enforces quality across **any language** via three mechanisms:
 - **`rigor audit`** — pre-commit enforcement for `.sh` (style/security checks) and `.yaml`/`.yml` (hardcoded IP detection). These checks are extension-gated and apply only to the relevant file types.
 - **`rigor lint`** — runs configured static analysis backends per extension. Default: `shellcheck` on `.sh`. Configure additional languages via `RIGOR_LINT_BACKENDS`.
 - **`rigor review`** — AI-assisted review for any staged content, regardless of language.
+- **`bin/ai-triage-pod`** — AI-assisted Kubernetes pod diagnosis that bundles `kubectl describe pod` and logs, plus optional stdin/file context.
 
 Shell scripts without a `.sh` extension (e.g. `bin/rigor` itself) are not supported by `rigor lint` — extension matching is required. Use `shellcheck` directly for extensionless scripts.
 
@@ -65,6 +66,7 @@ bin/rigor lint                # run all configured backends on tracked files
 bin/rigor lint path/to/foo.sh # run matching backend for specific file(s)
 bin/rigor checkpoint          # stage all + commit checkpoint (safe mid-task save)
 bin/rigor review --prompt "review this change for shell injection"
+bin/ai-triage-pod ns pod      # bundle describe/logs into ai-review for diagnosis
 ```
 
 ---
