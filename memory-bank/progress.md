@@ -17,6 +17,12 @@
 - [x] pyjenkinsapi symlink refactor (SHA: `65621642`)
 - [x] Retrospective added to rigor-cli-v0.1.6 (commit: `cca6240`)
 
+## Completed (v0.1.6)
+- [x] Add `bin/ai-triage-pod` for Kubernetes pod triage with optional stdin/file context (`4f47a2c`)
+- [x] Add `-f FILE` / `-f -` context-only mode to `bin/ai-triage-pod` (`469474d`)
+- [x] Document `ai-triage-pod` in `docs/howto/ai-triage-pod.md` and `docs/howto/use-ai-helpers.md`
+- [x] Add BATS coverage for the new helper
+
 ## Post-Merge Housekeeping (2026-05-08)
 - [x] Branch protection pyjenkinsapi main: 1 review + enforce_admins
 - [x] enforce_admins restored on rigor-cli main

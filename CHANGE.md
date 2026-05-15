@@ -1,9 +1,19 @@
 # Changes — rigor-cli
 
+## [Unreleased]
+
+### Added
+- `bin/ai-triage-pod`: collects `kubectl describe pod` + recent logs, appends optional stdin and `--context-file` content, then sends the bundle to `ai-review`
+- `docs/howto/ai-triage-pod.md`: usage guide for pod triage and optional context inputs
+- `docs/howto/use-ai-helpers.md`: helper index updated to include `ai-triage-pod`
+
 ## [v0.1.6] — 2026-05-08
 
 ### Fixed
 - Resolve symlink in `${BASH_SOURCE[0]}` before locating `rigor` binary — `bin/ai-bootstrap`, `bin/ai-lint`, `bin/ai-review` now work correctly when invoked through a symlink
+
+### Changed
+- `bin/ai-review`: `RIGOR_REVIEW_MAX_LINES` default raised from 1000 to 5000
 
 ---
 
