@@ -12,6 +12,9 @@
 ### Fixed
 - Resolve symlink in `${BASH_SOURCE[0]}` before locating `rigor` binary — `bin/ai-bootstrap`, `bin/ai-lint`, `bin/ai-review` now work correctly when invoked through a symlink
 
+### Changed
+- `bin/ai-review`: `RIGOR_REVIEW_MAX_LINES` default raised from 1000 to 5000
+
 ---
 
 ## [v0.1.5] — 2026-05-08

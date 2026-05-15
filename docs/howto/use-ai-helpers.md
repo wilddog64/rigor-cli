@@ -45,7 +45,7 @@ Runs `rigor lint` with per-language backend dispatch.
 ```bash
 bin/ai-lint                        # lint all tracked files
 bin/ai-lint src/foo.py             # lint specific file
-git diff --name-only | bin/ai-lint # lint changed files
+git diff --name-only | xargs bin/ai-lint # lint changed files
 ```
 
 | Env var | Default | Purpose |
@@ -114,8 +114,10 @@ printf 'LDAP bind failed after secret rotation' | bin/ai-triage-pod identity key
 
 ## Updating rigor-cli
 
+Run from the repo root (the same directory where `bin/` lives):
+
 ```bash
-bash setup-ai-helpers.sh --update
+bash tools/rigor-cli/docs/gists/gist-02-ai-helpers/setup-ai-helpers.sh --update
 # equivalent to:
 git subtree pull --prefix=tools/rigor-cli \
   https://github.com/wilddog64/rigor-cli.git main --squash

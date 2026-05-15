@@ -119,6 +119,7 @@ main() {
   done
 
   _check_deps
+  cd "$(git rev-parse --show-toplevel)"
 
   if [[ "$update" -eq 1 ]]; then
     _subtree_pull "$prefix"
